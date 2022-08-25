@@ -1,5 +1,5 @@
 # Scalable Arduino-Based LoRa Sensor Network
-Uses Arduino-Uno to build a network of LoRa transceivers.
+Uses Arduino-Uno to build a network of LoRa transceivers and associated sensors.
 
 
 In an earlier effort, https://github.com/SoothingMist/Remote-Soil-Moisture-Sensing, a prototype for using LoRa radio broadcasts to remotely monitor sensors was demonstrated. Soil-moisture is the application but the approach is general enough that other sensors could be employed. Open-Source software and hardware were employed as much as possible. The basestation can be hosted locally, with no network employed, or remotely, via the internet or a local network.
