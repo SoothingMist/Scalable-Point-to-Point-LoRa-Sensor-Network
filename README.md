@@ -8,9 +8,9 @@ At issue with the earlier effort is that it works well in situations where there
 
 This present project uses ArduinoUno/Dragino microcontroller/transceiver units from the earlier effort to build a network of transceiver/sensing units in such a way that the overall system is scalable but without using formal and expensive LoRaWAN equipment. In a sense, hardware is replaced by software. To be sure, the formal LoRaWAN standard has not been implemented. However, many of its attributes are present.
 
-This particular posting demonstrates AES encryption/decryption as signals pass from transmitter to receiver.
+Each zip file contains a component of the system. Be sure to see ReadMe.pdf within each zip file for details.
 
-Be sure to see ReadMe.pdf within this project's zip file for more details.
+A full paper has been submitted for publication in the peer-reviewed literature on this project.
 
 # License
 
