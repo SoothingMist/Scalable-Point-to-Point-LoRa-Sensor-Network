@@ -10,7 +10,16 @@ This present project uses ArduinoUno/Dragino microcontroller/transceiver units f
 
 Each zip file contains a component of the system. Be sure to see ReadMe.pdf within each zip file for details.
 
-A full paper has been submitted for publication in the peer-reviewed literature on this project.
+A full paper has been submitted for publication in the peer-reviewed literature on this project. The paper's co-authors are contributors to this project.
+
+- Professor Philip Branch, School of Science, Computing and Engineering Technologies, Swinburne University of Technology,
+Melbourne, Australia
+
+- Professor Binghao Li, Faculty of Engineering, University of New South Wales, Sydney, Australia
+
+- Professor Kai Zhao, Faculty of Engineering, University of New South Wales, Sydney, Australia
+  
+Their earlier paper discussed the design, implementation, and testing of their flood-messaging network. The citation and link to their paper is: Branch, P., Li, B., Zhao, K. (2020) A LoRa-Based Linear Sensor Network for Location Data in Underground Mining. MDPI, Telecom, 1(2), 68-79, https://www.mdpi.com/2673-4001/1/2/6. 
 
 # License
 
