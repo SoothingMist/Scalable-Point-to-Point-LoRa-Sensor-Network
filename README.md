@@ -1,6 +1,4 @@
-# Scalable Arduino-Based LoRa Sensor Network
-Uses Arduino-Uno to build a network of LoRa transceivers and associated sensors.
-
+# Scalable ArduinoUno/Dragino LoRa Sensor Network - Without LoRaWAN
 
 In an earlier effort, https://github.com/SoothingMist/Remote-Soil-Moisture-Sensing, a prototype for using LoRa radio broadcasts to remotely monitor sensors was demonstrated. Soil-moisture is the application but the approach is general enough that other sensors could be employed. Open-Access software and programming tools were used exclusively. Open-Access hardware was employed as much as possible. The basestation can be hosted locally, with no network employed, or remotely, via the internet or a local network.
 
@@ -19,7 +17,10 @@ Melbourne, Australia
 
 - Professor Kai Zhao, Faculty of Engineering, University of New South Wales, Sydney, Australia
   
-Their earlier paper discussed the design, implementation, and testing of their flood-messaging network. The citation and link to their paper is: Branch, P., Li, B., Zhao, K. (2020) A LoRa-Based Linear Sensor Network for Location Data in Underground Mining. MDPI, Telecom, 1(2), 68-79, https://www.mdpi.com/2673-4001/1/2/6. 
+Their earlier paper discussed the design, implementation, and testing of their flood-messaging network. The citation and link to their paper is: Branch, P., Li, B., Zhao, K. (2020) A LoRa-Based Linear Sensor Network for Location Data in Underground Mining. MDPI, Telecom, 1(2), 68-79, https://www.mdpi.com/2673-4001/1/2/6.
+
+# Files
+
 
 # License
 
