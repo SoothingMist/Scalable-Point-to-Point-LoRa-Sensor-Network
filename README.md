@@ -19,7 +19,10 @@ Melbourne, Australia
   
 Their earlier paper discussed the design, implementation, and testing of their flood-messaging network. The citation and link to their paper is: Branch, P., Li, B., Zhao, K. (2020) A LoRa-Based Linear Sensor Network for Location Data in Underground Mining. MDPI, Telecom, 1(2), 68-79, https://www.mdpi.com/2673-4001/1/2/6.
 
+
 # Files
+
+* EncryptDecrypt.zip: Demonstrates how to add AES encryption/decryption to ArduinoUno/Dragino microcontroller/transceiver units.
 
 
 # License
