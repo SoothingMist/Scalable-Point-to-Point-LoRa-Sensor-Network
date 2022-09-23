@@ -8,7 +8,9 @@ This present project uses ArduinoUno/Dragino microcontroller/transceiver units f
 
 Each zip file contains a component of the system. Be sure to see ReadMe.pdf within each zip file for details.
 
-A full paper has been submitted for publication in the peer-reviewed literature on this project. The paper's co-authors are contributors to this project.
+A full paper has been submitted for publication in the peer-reviewed literature on this project. 
+
+These are contributors to this project.
 
 - Professor Philip Branch, School of Science, Computing and Engineering Technologies, Swinburne University of Technology,
 Melbourne, Australia
