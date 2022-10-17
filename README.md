@@ -4,7 +4,7 @@ In an earlier effort, https://github.com/SoothingMist/Remote-Soil-Moisture-Sensi
 
 At issue with the earlier effort is that it works well in situations where there are no inhibitions to the propagation of the transmitter’s radio broadcasts. For instance, there may be a hill between the transmitter and the receiver. As the number of sensors expands and the number of propagation inhibitors increases, a network of transceivers would need to be formed. This would enhance the scalability of the overall system.
 
-This present project uses ArduinoUno/Dragino microcontroller/transceiver units from the earlier effort to build a network of transceiver/sensing units in such a way that the overall system is scalable but without using formal and expensive LoRaWAN equipment. In a sense, hardware is replaced by software. To be sure, the formal LoRaWAN standard has not been implemented. However, many of its attributes are present.
+This present project uses ArduinoUno/Dragino microcontroller/transceiver units from the earlier effort to build a network of transceiver/sensing units in such a way that the overall system is scalable but without using complex and expensive LoRaWAN. In a sense, hardware is replaced by software. To be sure, the formal LoRaWAN standard has not been implemented. However, many of its attributes are present.
 
 Each zip file contains a component of the system. Be sure to see ReadMe.pdf within each zip file for details.
 
@@ -27,6 +27,8 @@ Their earlier paper discussed the design, implementation, and testing of their f
 * EncryptDecrypt.zip: Demonstrates how to add AES encryption/decryption to ArduinoUno/Dragino microcontroller/transceiver units.
 
 * Uno-On-off.zip: Demonstrates Arduino's external on/off timer as a means of saving battery charge.
+
+Other code is awaiting the journal's review of the submitted paper.
 
 
 # License
