@@ -1,5 +1,5 @@
 # Scalable ArduinoUno/Dragino LoRa Sensor Network
-# - Without LoRaWAN -
+# - Without LoRaWAN
 
 In an earlier effort, https://github.com/SoothingMist/Remote-Soil-Moisture-Sensing, a prototype for using LoRa radio broadcasts to remotely monitor sensors was demonstrated. Soil-moisture is the application but the approach is general enough that other sensors could be employed. Open-Access software and programming tools were used exclusively. Open-Access hardware was employed as much as possible. The basestation can be hosted locally, with no network employed, or remotely, via the internet or a local network.
 
