@@ -29,7 +29,7 @@ Their earlier paper discussed the design, implementation, and testing of their f
 
 * Uno-On-off.zip: Demonstrates Arduino's external on/off timer as a means of saving battery charge.
 
-Other code is awaiting the journal's review of the submitted paper.
+* LoRaFloodMessaging: Software and background for the LoRa Flood Messaging proof of concept.
 
 
 # License
