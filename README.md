@@ -31,6 +31,7 @@ Their earlier paper discussed the design, implementation, and testing of their f
 
 * LoRaFloodMessaging: Software and background for the LoRa Flood Messaging proof of concept.
 
+* ImageSegmentation-Arduino-ColorImage-PureBinary-Testing-USB: Demonstration of trasmitting files from Adruino Uno microcontroller to PC using USB port. No LoRa involved yet. That is coming.
 
 # License
 
