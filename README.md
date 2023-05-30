@@ -31,7 +31,7 @@ Their earlier paper discussed the design, implementation, and testing of their f
 
 * LoRaFloodMessaging: Software and background for the LoRa Flood Messaging proof of concept.
 
-* ImageSegmentation-Arduino-ColorImage-PureBinary-Testing-USB: Demonstration of trasmitting files from Adruino Uno microcontroller to PC using USB port. No LoRa involved yet. That is coming.
+* CaptureCameraFrames_Uploaded: Demonstration of Arduino Potenta H7 microcontroller board coupled with Vision Shield - LoRa to capture, send via USB/Serial, and display the camera's image on a PC. This is part of a learning process aimed at eventual LoRa broadcast of images.
 
 # License
 
