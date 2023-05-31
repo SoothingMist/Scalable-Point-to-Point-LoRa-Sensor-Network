@@ -25,13 +25,15 @@ Their earlier paper discussed the design, implementation, and testing of their f
 
 # Files
 
-* EncryptDecrypt.zip: Demonstrates how to add AES encryption/decryption to ArduinoUno/Dragino microcontroller/transceiver units.
+* EncryptDecrypt: Demonstrates how to add AES encryption/decryption to ArduinoUno/Dragino microcontroller/transceiver units.
 
-* Uno-On-off.zip: Demonstrates Arduino's external on/off timer as a means of saving battery charge.
+* Uno-On-off: Demonstrates Arduino's external on/off timer as a means of saving battery charge.
 
 * LoRaFloodMessaging: Software and background for the LoRa Flood Messaging proof of concept.
 
 * CaptureCameraFrames_Uploaded: Demonstration of Arduino Potenta H7 microcontroller board coupled with Vision Shield - LoRa to capture, send via USB/Serial, and display the camera's image on a PC. This is part of a learning process aimed at eventual LoRa broadcast of images.
+
+* CaptureAndSendFrames_Uploaded: Functionally similar to CaptureCameraFrames_Uploaded but uses LoRa-sized messages that contain a CRC check value.
 
 # License
 
