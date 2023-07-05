@@ -9,9 +9,9 @@ This present project uses ArduinoUno/Dragino microcontroller/transceiver units f
 
 Each zip file contains a component of the system. Be sure to see ReadMe.pdf within each zip file for details.
 
-A full paper has been submitted for publication in the peer-reviewed literature on this project. 
+A full paper has been submitted for publication in the peer-reviewed literature on the LoRa flood-messaging proof of concept. 
 
-These are contributors to this project.
+These are contributors to that project.
 
 - Professor Philip Branch, School of Science, Computing and Engineering Technologies, Swinburne University of Technology,
 Melbourne, Australia
@@ -34,6 +34,8 @@ Their earlier paper discussed the design, implementation, and testing of their f
 * CaptureCameraFrames_Uploaded: Demonstration of Arduino Potenta H7 microcontroller board coupled with Vision Shield - LoRa to capture, send via USB/Serial, and display the camera's image on a PC. This is part of a learning process aimed at eventual LoRa broadcast of images.
 
 * CaptureAndSendFrames_Uploaded: Functionally similar to CaptureCameraFrames_Uploaded but uses LoRa-sized messages that contain a CRC check value.
+
+* Programmable_USB_Hub: The H7 device did not work out for this effort since its camera is only grayscale and it will not do LoRa point-to-point, as far as I can determine. Going to try linking two Arduino Uno microcontrollers via a programmable USB hub. This code demonstrates the basic concept.
 
 # License
 
