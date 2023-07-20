@@ -38,6 +38,8 @@ Their earlier paper discussed the design, implementation, and testing of their L
 
 * Pixy-ImageSegmentation: Demonstrates a microcontroller/camera unit sending LoRa-sized image segments to a PC. The segments are reconstructed and displayed. LoRa itself is not yet engaged.
 
+* USB_Hub_LoRa_Images: Demonstrates an application of programmable USB/Serial hubs. Two disparate devices are enabled to communicate. The application captures camera data from one device and broadcasts it via LoRa point-to-point on another device. A basestation receives the broadcasts and reconstructs the image. 
+
 # License
 
 GNU Affero General Public License v3.0
