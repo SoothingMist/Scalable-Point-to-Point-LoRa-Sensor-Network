@@ -18,13 +18,13 @@ At issue with all forms of radio broadcast are inhibitions to propagation. For i
 
 This project uses ArduinoUnoR3/Dragino microcontroller/transceiver units to build a network of transceiver/sensing units in such a way that the overall system is scalable. In a sense, hardware is replaced by software. To be sure, the formal LoRaWAN standard has not been implemented. However, many of its attributes are present. Where sensors that deliver more than one value are concerned, dealing with such sensors may require more memory than the Uno R3 can provide. There is also the issue of the sensor not being compatible with the transceiver because of the way the two integrate with the microcontroller board. In such a case, a Raspberry headless computer is employed to create a programmable USB/Serial hub to which two Uno R3 microcontrollers are connected, one for the sensor and one for the transceiver. I2C communication is not used because of the size and volume of messages.
 
-Flood-Messaging is the approach used in this project. In many ways, it is a lot like UDP networking. Delivery of messages is highly likely but not absolutely guaranteed. A full paper has been submitted for publication in the peer-reviewed literature on the underlying LoRa flood-messaging proof of concept that underlies this project. These are the contributors to that phase of the project:
+Flood-Messaging is the approach used in this project. In many ways, it is a lot like UDP networking. Delivery of messages is highly likely but not absolutely guaranteed. These are the originators of that phase of this project:
 
 - Professor Philip Branch, School of Science, Computing and Engineering Technologies, Swinburne University of Technology, Melbourne, Australia
 - Professor Binghao Li, Faculty of Engineering, University of New South Wales, Sydney, Australia
 - Professor Kai Zhao, Faculty of Engineering, University of New South Wales, Sydney, Australia
   
-Their earlier paper discussed the design, implementation, and testing of their LoRa flood-messaging network. The citation and link to their paper is: Branch, P., Li, B., Zhao, K. (2020) A LoRa-Based Linear Sensor Network for Location Data in Underground Mining. MDPI, Telecom, 1(2), 68-79, https://www.mdpi.com/2673-4001/1/2/6.
+Their paper discussed the design, implementation, and testing of their LoRa flood-messaging network. The citation and link to their paper is: Branch, P., Li, B., Zhao, K. (2020) A LoRa-Based Linear Sensor Network for Location Data in Underground Mining. MDPI, Telecom, 1(2), 68-79, https://www.mdpi.com/2673-4001/1/2/6.
 
 # Files
 
