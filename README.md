@@ -5,7 +5,10 @@ Many applications, including precision irrigation, require remote-sensing of dat
 
 *** IMPORTANT: This project uses Dragino’s Lora Shield. Dragino’s Lora Shield is NOT Dragino’s LA66 LoRaWAN shield. That is something different. The software developed in this project will not run on that particular shield. At the start of 2024 I found out that Dragino’s Lora Shield is at its end-of-life, is scheduled for obsolescence, and will be discontinued. It is still available through many sellers. Their new shield, according to its documentation, is capable of both peer-to-peer and LoRaWAN. Message handling in this project's software is kept seperate from code that interacts with LoRa. Thus, transition should be achievable, although the new shield uses a completely different software library.
 
-A paper has been published on this project: https://academicjournals.org/journal/JECI/article-abstract/A973F1271109.
+Two papers have been published on this project:
+
+ * https://academicjournals.org/journal/JECI/article-abstract/A973F1271109
+ * http://informationanthology.net/OFE22-Raeth-OFE2023-paper.pdf
 
 Please post any comments under project issues. Glad to hear them as they help the project improve.
 
