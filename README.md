@@ -32,7 +32,7 @@ Each module listed below contains software and documentation in a zip file for a
 
 * EncryptDecrypt: Demonstrates how to add AES encryption/decryption to ArduinoUno/Dragino microcontroller/transceiver units.
 
-* Uno-On-off: Demonstrates Arduino's external on/off timer as a means of saving battery charge.
+* Uno-On-Off: Demonstrates Arduino's external on/off timer as a means of saving battery charge.
 
 * Remote-Soil-Moisture-Sensing: A first shot at using LoRa for remote sensing.
 
