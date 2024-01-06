@@ -50,6 +50,9 @@ Each module listed below contains software and documentation in a zip file for a
 
 * LoRaBinaryFloodMessaging: Binary-Messages version of LoRaFloodMessaging. Includes single-value sensor and camera. Evolving project. Binary messages and flood-messaging are fully implemented. Documentation explains setup and operation.
 
+* SolarPowerForLoRaNodes: Adds solar power to LoRa nodes.
+  
+
 # License
 
 GNU Affero General Public License v3.0
