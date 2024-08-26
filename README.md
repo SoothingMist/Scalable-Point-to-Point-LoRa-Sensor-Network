@@ -48,7 +48,7 @@ Each module listed below contains software and documentation in a zip file for a
 
 * USB_Hub_LoRa_Images: Demonstrates an application of programmable USB/Serial hubs. Two disparate devices are enabled to communicate. The application captures camera data from one device and broadcasts it via LoRa point-to-point on another device. A basestation receives the broadcasts and reconstructs the image.
 
-* LoRaBinaryFloodMessaging: Binary-Messages version of LoRaFloodMessaging. Includes single-value sensor and camera. Evolving project. Binary messages and flood-messaging are fully implemented. Documentation explains setup and operation.
+* LoRaBinaryFloodMessaging: Binary-Messages version of LoRaFloodMessaging. Includes single-value sensor and camera. Binary messages and flood-messaging are fully implemented. Documentation explains setup and operation.
 
 * SolarPowerForLoRaNodes: Adds solar power to LoRa nodes.
   
