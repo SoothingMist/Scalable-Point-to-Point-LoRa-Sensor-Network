@@ -1,1 +1,1 @@
-Each directory contains the files for the associated flood-messaging network node.
+Each directory contains the files for the associated grassroots flood-messaging network node.
