@@ -97,7 +97,7 @@ void OnRxDone(uint8_t* payload, uint16_t size, int16_t rssi, int8_t snr)
     #ifdef DEBUG
       Serial.println("Received true. Message rebroadcast.");
     #endif
-    //  Radio.Send(MESSAGE, MESSAGE[LOCATION_MESSAGE_BYTES]);
+    Radio.Send(MESSAGE, MESSAGE[LOCATION_MESSAGE_BYTES]);
   }
   #ifdef DEBUG
     else
