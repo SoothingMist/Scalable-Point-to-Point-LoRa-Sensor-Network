@@ -14,7 +14,6 @@ MessageHandling MessageHandler;
 
 // For working with the transceiver
 #include "LoRaWan-Arduino.h" // Click here to get the library: http://librarymanager/All#SX126x
-#include <SPI.h>
 
 // Forward function declarations
 void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr);
@@ -29,7 +28,7 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr);
 #define LORA_SYMBOL_TIMEOUT 0	  // Symbols
 #define LORA_FIX_LENGTH_PAYLOAD_ON false
 #define LORA_IQ_INVERSION_ON false
-#define RX_TIMEOUT_VALUE 3000
+#define RX_TIMEOUT_VALUE 0
 #define TX_TIMEOUT_VALUE 3000
 
 // LoRa chip variables
@@ -38,16 +37,27 @@ static RadioEvents_t RadioEvents;
 void setup()
 {
 	// Initialize Serial port
-	Serial.begin(9600);
-	while (!Serial) delay(100);
- 
+	Serial.begin(115200);
+	time_t serial_timeout = millis();
+	while (!Serial)
+	{
+		if ((millis() - serial_timeout) < 5000)
+		{
+			delay(100);
+		}
+		else
+		{
+			break;
+		}
+	}
+
   // Initialize LoRa chip.
   lora_rak11300_init();
 
 	// Initialize the Radio callbacks
 	RadioEvents.TxDone = NULL;
 	RadioEvents.RxDone = OnRxDone;
-  RadioEvents.TxTimeout = NULL;
+	RadioEvents.TxTimeout = NULL;
 	RadioEvents.RxTimeout = NULL;
 	RadioEvents.RxError = NULL;
 	RadioEvents.CadDone = NULL;
@@ -58,18 +68,18 @@ void setup()
 	// Set Radio channel (operating frequency)
 	Radio.SetChannel(RF_FREQUENCY);
 
-	// Set Radio TX configuration
-	Radio.SetTxConfig(MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
-					  LORA_SPREADING_FACTOR, LORA_CODINGRATE,
-					  LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
-					  true, 0, 0, LORA_IQ_INVERSION_ON, TX_TIMEOUT_VALUE);
+	// Set Radio RX configuration
+	Radio.SetRxConfig(MODEM_LORA, LORA_BANDWIDTH, LORA_SPREADING_FACTOR,
+					  LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
+					  LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
+					  0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
 
   // Ready to go
 	Radio.Rx(RX_TIMEOUT_VALUE);
   #ifdef DEBUG
-    Serial.println("=======================================");
-    Serial.println("LoRaP2P Basestation Ready");
-    Serial.println("=======================================");
+    Serial.print("=======================================");
+    Serial.print("\nLoRaP2P Basestation Ready\n");
+    Serial.print("=======================================");
   #endif
 }
 
@@ -81,24 +91,21 @@ void loop()
 
 void OnRxDone(uint8_t* payload, uint16_t size, int16_t rssi, int8_t snr)
 {
-	delay(100);
-
   #ifdef DEBUG
-    Serial.println("\nOnRxDone");
+    Serial.println("\n\nOnRxDone");
     Serial.printf("Size = %d bytes, RssiValue = %d dBm, SnrValue = %d\n", (int)size, (int)rssi, (int)snr);
-    for (uint16_t i = MESSAGE_HEADER_LENGTH; i < size; i++) Serial.printf("%c", payload[i]);
-    Serial.println();
   #endif
 
 	// Decide whether or not to pass on to the PC component of the basestation.
   memcpy(MESSAGE, payload, size);
-  if(MessageHandler.CheckForPassthrough())
+  if(MessageHandler.CheckForPassthrough(size))
   {
     #ifdef DEBUG
-      Serial.println("Received true. Message passed forward.");
+      Serial.println("Received true. Message passed forward:");
+      for (uint16_t i = MESSAGE_HEADER_LENGTH; i < size; i++) Serial.printf("%c", payload[i]);
+      Serial.println();
     #endif
     Serial.write(MESSAGE, MESSAGE[LOCATION_MESSAGE_INDEX] + 1);
-
   }
   #ifdef DEBUG
     else

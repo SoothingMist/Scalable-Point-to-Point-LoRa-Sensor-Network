@@ -53,7 +53,7 @@ public:
   MessageHandling();
 
   // Rebroadcast as needed
-  bool CheckForPassthrough();
+  bool CheckForPassthrough(uint16_t size);
 
 private:
 

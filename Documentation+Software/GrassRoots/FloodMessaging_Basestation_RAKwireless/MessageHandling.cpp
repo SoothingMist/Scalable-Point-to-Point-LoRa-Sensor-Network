@@ -9,39 +9,55 @@ MessageHandling::MessageHandling()
 }
 
 // Pass messages through as appropriate.
-bool MessageHandling::CheckForPassthrough()
+bool MessageHandling::CheckForPassthrough(uint16_t size)
 {
-  if(MESSAGE[LOCATION_SYSTEM_ID] != SYSTEM_ID) // only accept messages from a specified system
-  {
-    #ifdef DEBUG
-      Serial.printf("%s (%3d / %3d)\n", "Message not for this system.",
-       (int)MESSAGE[LOCATION_SYSTEM_ID], (int)SYSTEM_ID);
-    #endif
-    return false;
-  }
-  else if(MESSAGE[LOCATION_DESTINATION_ID] != NODE_ID)
-  {
-    #ifdef DEBUG
-      Serial.printf("%s (%3d / %3d)\n", "Message not for this node.",
-       (int)MESSAGE[LOCATION_DESTINATION_ID], (int)NODE_ID);
-    #endif
-    return false;
-  }
-  else if(MESSAGE[LOCATION_SOURCE_ID] >= MAX_NODES) // can only handle a maximum number of network nodes
-  {
-    return false;
-  }
-  else if(GetMessageID() <= LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]]) // reject earlier messages
-  {
-    return false;
-  }
-  else // pass this message forward
-  {
-    // Update message table
-    LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]] = GetMessageID();
+  // Messages to be rejected
 
-    return true;
+  if(size <= MESSAGE_HEADER_LENGTH) 
+  {
+    #ifdef DEBUG
+      Serial.printf("Message too short for this system.\n");
+    #endif
+    return false;
   }
+
+  if(MESSAGE[LOCATION_SYSTEM_ID] != SYSTEM_ID) 
+  {
+    #ifdef DEBUG
+      Serial.printf("Message for a different system.\n");
+    #endif
+    return false;
+  }
+
+  if(MESSAGE[LOCATION_SOURCE_ID] > MAX_NODES) 
+  {
+    #ifdef DEBUG
+      Serial.printf("Source ID outside system capacity.");
+    #endif
+    return false;
+  }
+
+  if(GetMessageID() <= LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]]) // do not rebroadcast earlier messages
+  {
+    #ifdef DEBUG
+      Serial.printf("Not allowed to rebroadcast current or historical messages.\n");
+    #endif
+    return false;
+  } 
+ 
+  // Message accepted for forwarding
+
+  #ifdef DEBUG
+    Serial.print("Message accepted for forwarding (Current/Previous Message ID): ");
+    Serial.print(GetMessageID()); Serial.print(" / ");
+    Serial.println(LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]]);
+  #endif
+
+  // Update message table
+  if (MESSAGE[LOCATION_MESSAGE_TYPE] == 9) LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]] = 0; //Reset message ID for this node
+  else LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]] = GetMessageID();
+  
+  return true;
 }
 
 // Retrieve the message's ID
