@@ -7,15 +7,15 @@
 # Maybe interesting:
 # https://stackoverflow.com/questions/50881227/display-images-in-a-grid
 
-import numpy as np # https://numpy.org
+# Imported libraries
 import serial, serial.tools.list_ports # https://pypi.org/project/pyserial
 import time # https://docs.python.org/3/library/time.html
 
 # Constants. These values should not be changed.
 
-# Refers to serial port
+# Serial port to which the LoRa transceiver is connected
 Serial_Port = None
-SERIAL_PORT_NAME = 'COM4' # Windows
+SERIAL_PORT_NAME = 'COM8' # Windows
 #Serial_PORT_NAME = '/dev/ttyACM1' # Linux
 SERIAL_PORT_BAUD_RATE = 9600
 
@@ -37,20 +37,18 @@ MESSAGE_HEADER_LENGTH   = 9
 # https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python
 def FindSerialPorts():
   print("\nSerial Ports:")
-  Ports = serial.tools.list_ports.comports()
-  found = False
-  if Ports is not None:
-    print("Detected ", len(Ports), " total ports")
-    for port in Ports:
+  ports = serial.tools.list_ports.comports()
+  if ports is not None:
+    print("Detected ", len(ports), " total ports")
+    for port in ports:
       print(port.name, "\t:\t", port.device, "\t:\t", port.manufacturer)
-      found = True
-  if not found: print("No ports found")
+  else: print("No ports found")
   print()
 
 # Connect to the correct serial port.
 def ConnectSerialPort(GENERIC_PORT_NAME):
   global Serial_Port
-  # Identify the device connected to one of the two ports
+  # Identify the device connected to the specified port
   try:
     Serial_Port = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_RATE)
   except Exception as thisException:  # https://docs.python.org/3/tutorial/errors.html
@@ -89,7 +87,7 @@ if __name__ == '__main__':
       contents = ""
       for i in range(MESSAGE_HEADER_LENGTH, message[0] + 1): contents += chr(message[i])
       if contents == EXPECTED_FINAL_MESSAGE: notDone = False
-      else: print(contents)
+      else: print(str(time.time()) + ": " +  contents)
     else: print("Unknown message type")
 
   # Finished
