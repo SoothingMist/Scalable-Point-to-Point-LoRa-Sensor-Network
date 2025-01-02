@@ -52,7 +52,7 @@ public:
   MessageHandling();
 
   // Rebroadcast as needed
-  bool CheckForRebroadcast();
+  bool CheckForRebroadcast(uint16_t size);
 
 private:
 

@@ -9,44 +9,66 @@ MessageHandling::MessageHandling()
 }
 
 // Pass messages through as appropriate.
-bool MessageHandling::CheckForRebroadcast()
+bool MessageHandling::CheckForRebroadcast(uint16_t size)
 {
-  if(MESSAGE[LOCATION_SYSTEM_ID] != SYSTEM_ID)
+  // Messages to be rejected
+
+  if(size <= MESSAGE_HEADER_LENGTH) 
   {
     #ifdef DEBUG
-      Serial.printf("%s (%3d / %3d)\n", "Message not for this system.",
-       (int)MESSAGE[LOCATION_SYSTEM_ID], (int)SYSTEM_ID);
+      Serial.printf("Message too short for this system.\n");
     #endif
     return false;
   }
 
-  if(MESSAGE[LOCATION_SOURCE_ID] < MAX_NODES) // can only handle a maximum number of network nodes
+  if(MESSAGE[LOCATION_SYSTEM_ID] != SYSTEM_ID) 
   {
-    if(MESSAGE[LOCATION_REBROADCASTS] > 00) // if time-to-live exceeded, do not rebroadcast
-    {
-      #ifdef DEBUG
-        Serial.print("\tCurrent/Previous Message ID: ");
-        Serial.print(GetMessageID()); Serial.print(" / ");
-        Serial.println(LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]]);
-      #endif
-
-      if(GetMessageID() > LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]]) // do not rebroadcast earlier messages
-      {
-        // Update message table
-        if (MESSAGE[LOCATION_MESSAGE_TYPE] == 9) LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]] = 0; //Reset message ID for this node
-        else LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]] = GetMessageID();
-        
-        // Decrement the rebroadcasst counter
-        MESSAGE[LOCATION_REBROADCASTS] -= 1;
-              
-        // Rebroadcast the message
-	      return true;
-      }
-      else return false;
-    }
-    else return false;
+    #ifdef DEBUG
+      Serial.printf("Message for a different system.\n");
+    #endif
+    return false;
   }
-  else return false;
+
+  if(MESSAGE[LOCATION_SOURCE_ID] > MAX_NODES) 
+  {
+    #ifdef DEBUG
+      Serial.printf("Source ID outside system capacity.");
+    #endif
+    return false;
+  }
+
+  if(MESSAGE[LOCATION_REBROADCASTS] <= 00) // if time-to-live exceeded, do not rebroadcast
+  {
+    #ifdef DEBUG
+      Serial.printf("No further rebroadcasts allowed.\n");
+    #endif
+    return false;
+  }
+
+  if(GetMessageID() <= LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]]) // do not rebroadcast earlier messages
+  {
+    #ifdef DEBUG
+      Serial.printf("Not allowed to rebroadcast current or historical messages.\n");
+    #endif
+    return false;
+  } 
+ 
+  // Message accepted for forwarding
+
+  #ifdef DEBUG
+    Serial.print("Message accepted for forwarding (Current/Previous Message ID): ");
+    Serial.print(GetMessageID()); Serial.print(" / ");
+    Serial.println(LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]]);
+  #endif
+
+  // Update message table
+  if (MESSAGE[LOCATION_MESSAGE_TYPE] == 9) LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]] = 0; //Reset message ID for this node
+  else LatestMessageID[MESSAGE[LOCATION_SOURCE_ID]] = GetMessageID();
+  
+  // Decrement the rebroadcasst counter
+  MESSAGE[LOCATION_REBROADCASTS] -= 1;
+          
+  return true;
 }
 
 // Retrieve the message's ID
