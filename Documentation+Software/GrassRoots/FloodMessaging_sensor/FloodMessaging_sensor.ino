@@ -14,12 +14,18 @@ MessageConstruction MessageConstructor;
 
 // For working with the transceiver
 #include "LoRaWan-Arduino.h" // Click here to get the library: http://librarymanager/All#SX126x
-#include <SPI.h>
+#include "mbed.h"
+#include "rtos.h"
+rtos::Semaphore cadInProgress;
+bool channelBusy = true;
+#ifdef DEBUG
+  unsigned long int cadTime = 0;
+#endif
 
 // For working with the RAK1901 (SHTC3) temperature/humidity sensor
 #include <Wire.h>
 #include "SparkFun_SHTC3.h" // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
-SHTC3 g_shtc3;              // Declare an instance of the SHTC3 class (required for temperature/humidity sensor RAK1901)
+SHTC3 g_shtc3; // Declare an instance of the SHTC3 class (required for temperature/humidity sensor RAK1901)
 float percentRH;
 float degreesC;
 
@@ -38,6 +44,7 @@ float volts;
 void OnTxDone(void);
 void OnTxTimeout(void);
 void send();
+void OnCadDone(bool cadResult);
 void shtc3_decode_errors(SHTC3_Status_TypeDef message);
 void shtc3_read_data(void);
 float readVBAT(void);
@@ -52,8 +59,8 @@ float readVBAT(void);
 #define LORA_SYMBOL_TIMEOUT 0	  // Symbols
 #define LORA_FIX_LENGTH_PAYLOAD_ON false
 #define LORA_IQ_INVERSION_ON false
-#define RX_TIMEOUT_VALUE 3000
-#define TX_TIMEOUT_VALUE 3000
+#define RX_TIMEOUT_VALUE 0
+#define TX_TIMEOUT_VALUE 5000
 
 // LoRa chip variables
 static RadioEvents_t RadioEvents;
@@ -61,14 +68,21 @@ static RadioEvents_t RadioEvents;
 void setup()
 {
 	// Initialize Serial port
+  unsigned long startTime = millis();
 	Serial.begin(9600);
-	while (!Serial) delay(100);
+  while (!Serial) 
+  {
+    if ((millis() - startTime) < TX_TIMEOUT_VALUE) delay(100);
+    else break;
+  }
+
   #ifdef DEBUG
     Serial.println("=================================================================");
     Serial.println("Initializing LoRaP2P Tx for sending sensor data via text messages");
     Serial.println("=================================================================");
     Serial.println("Serial port initialized");
   #endif
+  
   // Initialize LoRa chip.
   lora_rak11300_init();
 
@@ -78,7 +92,7 @@ void setup()
   RadioEvents.TxTimeout = OnTxTimeout;
 	RadioEvents.RxTimeout = NULL;
 	RadioEvents.RxError = NULL;
-	RadioEvents.CadDone = NULL;
+	RadioEvents.CadDone = OnCadDone;
 
 	// Initialize the Radio
 	Radio.Init(&RadioEvents);
@@ -140,7 +154,7 @@ void setup()
   // Ready to go
   #ifdef DEBUG
     Serial.println("=================================================================");
-    Serial.println("Initialization completed");
+    Serial.println("Sensor Node: Initialization completed");
     Serial.println("=================================================================");
   #endif
 }
@@ -160,8 +174,10 @@ void loop()
   // Send a message
   send();
 
-  // Wait a bit and repeat
-  delay(2000);
+  // Wait a bit and repeat.
+  // delay() is blocking and there is a lot going on in the background.
+  unsigned long startTime = millis();
+  while(millis() - startTime < TX_TIMEOUT_VALUE);
 }
 
 /** @brief Function to be executed on Radio Tx Done event
@@ -194,9 +210,89 @@ void send()
     Serial.print("Message: "); Serial.printf("%s\nHeader:", thisText);
     for(uint8_t i = 0; i < MESSAGE_HEADER_LENGTH; i++) Serial.printf("%4d", (int)MESSAGE[i]);
     Serial.println();
+    Serial.printf("Sending message of length %d\n", MESSAGE[LOCATION_MESSAGE_INDEX] + 1);
   #endif
-  Serial.println("Sending message");
+
+  // CAD to ensure channel not active. Wait until channel not busy.
+  // https://news.rakwireless.com/channel-activity-detection-ensuring-your-lora-r-packets-are-sent
+  // https://forum.rakwireless.com/t/how-to-calculate-the-best-cad-settings/13984/5
+  channelBusy = true; // assume channel is busy
+  while(channelBusy) // wait for channel to be not busy before sending a message
+  {
+    #ifdef DEBUG
+      cadTime = millis(); // mark the time CAD process starts
+    #endif
+    cadInProgress.release(); // reset the in-progress flag
+    Radio.Standby(); // put radio on standby
+    Radio.SetCadParams(LORA_CAD_08_SYMBOL, LORA_SPREADING_FACTOR + 13, 10, LORA_CAD_RX, 0);
+    unsigned long startTime = millis();
+    unsigned long stopTime = random(300);
+    while(millis() - startTime < stopTime);
+    while(!cadInProgress.try_acquire()); // aquire CAD semaphore
+
+    // Start CAD thread
+    // (It does seem CAD process runs as an independent thread)
+    #ifdef DEBUG
+      Serial.println("Starting CAD");
+    #endif
+    Radio.StartCad();
+
+    // Wait unti OnCadDone finishes
+    while(!cadInProgress.try_acquire());
+    if(channelBusy)
+    {
+      #ifdef DEBUG
+        Serial.println("Channel Busy");
+      #endif
+    }
+    #ifdef DEBUG
+      else Serial.println("Channel not busy");
+    #endif
+  }
+
 	Radio.Send(MESSAGE, MESSAGE[LOCATION_MESSAGE_INDEX] + 1);
+}
+
+/**
+   @brief CadDone callback: is the channel busy?
+*/
+void OnCadDone(bool cadResult)
+{
+  #ifdef DEBUG
+    time_t duration = millis() - cadTime;
+    if(cadResult) // true = busy / Channel Activity Detected; false = not busy / channel activity not detected
+    {
+      Serial.printf("CAD returned channel busy after %ldms\n", duration);
+    }
+    else
+    {
+      Serial.printf("CAD returned channel free after %ldms\n", duration);
+    }
+  #endif
+
+  channelBusy = cadResult;
+
+  #ifdef DEBUG
+    osStatus status = cadInProgress.release();
+    switch(status)
+    {
+      case osOK:
+        Serial.println("token has been correctly released");
+        break;
+      case osErrorResource:
+        Serial.println("maximum token count has been reached");
+        break;
+      case osErrorParameter:
+        Serial.println("semaphore internal error");
+        break;
+      default:
+        Serial.println("unrecognized semaphore error");
+        break;
+    }
+  #endif
+  #ifndef DEBUG
+    cadInProgress.release();
+  #endif
 }
 
 /**
