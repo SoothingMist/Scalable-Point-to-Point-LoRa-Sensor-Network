@@ -36,13 +36,6 @@ extern uint8_t MESSAGE[256];
 #define LOCATION_REBROADCASTS    8
 #define MESSAGE_HEADER_LENGTH    9
 
-// Given the limited memory on relay nodes, 
-// they can only keep track of a limted number of sender nodes.
-// Choose MAX_NODES accordingly.
-// Node IDs are assumed to be 1 .. (MAX_NODES -1), inclusive.
-// All relay nodes use ID = 0 since they do not originate messages.
-#define MAX_NODES 025
-
 class MessageHandling
 {
 
@@ -55,10 +48,6 @@ public:
   bool CheckForRebroadcast(uint16_t size);
 
 private:
-
-  // List of node IDs and their maximum message ID seen so far.
-  // Message IDs are assigned in sequence by the originating node.
-  uint16_t LatestMessageID[MAX_NODES];
 
   // Retrivals
   uint16_t GetMessageID();

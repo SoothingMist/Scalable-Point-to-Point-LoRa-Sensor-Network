@@ -14,7 +14,7 @@
 MessageHandling MessageHandler;
 
 // For working with the transceiver
-#include <SX126x-Arduino.h>
+#include <SX126x-Arduino.h> // Click here to get the library: http://librarymanager/All#SX126x
 
 // Function declarations
 void OnTxDone(void);
