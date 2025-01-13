@@ -48,7 +48,11 @@ void setup()
 
   // Wait for connection with external device
   Connect();
-  delay(1000);
+
+  // Send instigator message
+  MESSAGE[0] = 1;
+  MESSAGE[1] = 0;
+  ForwardMessage();
 }
 
 void loop()

@@ -141,12 +141,12 @@ if __name__ == '__main__':
   DoHandshakes()
   print("Handshakes exchanged\n") # the devices are now talking to each other
 
-  # Send instigator message
-  counter = bytes([0])
-  MESSAGE[0] = ONE
-  MESSAGE[1] = counter
-  SendMessage(PORT_A)
-  print("Instigator message sent to PORT_A")
+  # # Send instigator message
+  # counter = bytes([0])
+  # MESSAGE[0] = ONE
+  # MESSAGE[1] = counter
+  # SendMessage(PORT_A)
+  # print("Instigator message sent to PORT_A")
 
   # Look for and pass messages between the two devices.
   while True:
