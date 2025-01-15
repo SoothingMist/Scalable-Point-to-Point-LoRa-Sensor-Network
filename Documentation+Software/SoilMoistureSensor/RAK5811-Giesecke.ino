@@ -50,7 +50,7 @@ void setup()
 void loop()
 {
 	int i;
-	float mcu_ain_raw; // raw readubg from analog input
+	float mcu_ain_raw; // raw reading from analog input
 	float average_raw; // average of the raw readings
 	float mcu_ain_voltage; // conversion of raw readings to voltage
 	float voltage_sensor; // variable calibrated to give the voltage coming from the sensor
