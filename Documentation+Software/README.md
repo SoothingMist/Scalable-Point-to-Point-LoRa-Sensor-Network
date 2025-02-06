@@ -1,3 +1,8 @@
+
+***
+Just getting started now on a transition to Arduino MKR1310 LoRa/Microcontroller
+***
+
 This directory contains all documentation and software for this project.
 
 The subdirectories correspond with units and subunits in the documentation.
