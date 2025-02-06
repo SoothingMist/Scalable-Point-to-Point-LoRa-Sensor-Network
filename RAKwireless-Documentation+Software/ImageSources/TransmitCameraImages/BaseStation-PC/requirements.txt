@@ -1,0 +1,18 @@
+
+# These are the Python-Library requirements for this code.
+# Here is how to install them:
+
+# Using the Terminal (Command Console):
+# To install all of these, use  pip install -r requirements.txt
+# To install an individual item, use  pip install <item>
+# Ref: https://medium.com/@mushtaque87/flask-in-pycharm-community-edition-c0f68400d91e
+
+# Per https://stackoverflow.com/questions/11248073/what-is-the-easiest-way-to-remove-all-packages-installed-by-pip
+# To uninstall all packages, use the following sequence:
+#    pip freeze > uninstall.txt
+#    pip uninstall -r uninstall.txt -y
+# To uninstall an individual item, use   pip uninstall <item>
+
+numpy
+pyserial
+matplotlib
