@@ -2,7 +2,7 @@
 ***
 Am no longer developing with RAKwireless equipment but retain this posting since they still produce the devices in question.
 
-As a matter of personal opinion: Came to the conclusion that, for this project's purposes, the devices are too fragile physically and electrically.
+As a matter of personal opinion: Came to the conclusion that, for this project's purposes, the devices are too fragile physically and electrically. Technical support was excellent.
 ***
 
 This directory contains all documentation and software for RAKwireless implementation.
