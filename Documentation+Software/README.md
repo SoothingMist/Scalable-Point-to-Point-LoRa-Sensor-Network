@@ -1,4 +1,8 @@
 
+LoRa Flood-Messaging using Arduino MKR WAN 1310.
+
+This is where the project is being actively evolved.
+
 This directory contains all documentation and software for this project.
 
 The subdirectories correspond with units and subunits in the documentation.
