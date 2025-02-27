@@ -1,0 +1,14 @@
+ Modified copy of Sandeep LoRa library.
+ https://github.com/sandeepmistry/arduino-LoRa
+
+ Modified to make certain methods public.
+
+ Added rxSignalDetected method from
+ https://github.com/toyo/arduino-LoRa
+ to create a working form of CAD.
+
+ Added modifications from
+ https://github.com/mdias/arduino-LoRa/tree/master
+ to fix duplicate packet reception problem.
+
+ 
