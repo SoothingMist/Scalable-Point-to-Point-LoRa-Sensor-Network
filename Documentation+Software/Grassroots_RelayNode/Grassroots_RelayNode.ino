@@ -83,6 +83,10 @@ void loop()
     uint16_t thisMessageID = thisMessage[LOCATION_MESSAGE_ID];
     thisMessageID = (thisMessageID << 8) | thisMessage[LOCATION_MESSAGE_ID + 1];
 
+    // Reset message tracking table as appropriate
+    if(thisMessageID == 0) 
+      MessageTrackingTable[thisMessage[LOCATION_SOURCE_ID]] = 0;
+      
     // Ignore older messages.
     // Accept messages with the current message ID.
     if(thisMessageID < MessageTrackingTable[thisMessage[LOCATION_SOURCE_ID]])
