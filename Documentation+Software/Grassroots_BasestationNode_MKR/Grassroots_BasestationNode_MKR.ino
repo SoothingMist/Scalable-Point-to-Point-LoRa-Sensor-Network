@@ -53,6 +53,10 @@ void loop()
     uint16_t thisMessageID = thisMessage[LOCATION_MESSAGE_ID];
     thisMessageID = (thisMessageID << 8) | thisMessage[LOCATION_MESSAGE_ID + 1];
 
+    // Reset message tracking table as appropriate
+    if(thisMessageID == 0) 
+      messageTrackingVariable = 0;
+      
     // Ignore older messages or messages already seen.
 
     // Subtle but important difference between messages that hold a sensor's
