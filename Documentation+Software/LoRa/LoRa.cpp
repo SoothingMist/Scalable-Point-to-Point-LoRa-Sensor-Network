@@ -794,6 +794,7 @@ ISR_PREFIX void LoRaClass::onDio0Rise()
 // https://github.com/toyo/arduino-LoRa
 bool LoRaClass::rxSignalDetected()
 {
+  LoRa.receive();
   return (readRegister(REG_MODEM_STAT) & 0x01) == 0x01;
 }
 
