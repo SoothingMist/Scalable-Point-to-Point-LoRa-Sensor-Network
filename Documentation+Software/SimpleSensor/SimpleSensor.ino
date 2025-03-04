@@ -35,8 +35,6 @@ void setup()
   analogReadResolution(12);
 
   // Configure analog input pin.
-  // A0 will take up to 5vdc.
-  // We connect it to the 5v pin using a jumper.
   pinMode(inputPin, INPUT);
 
   // Ready
