@@ -30,7 +30,7 @@ PORT_B_BAUD_RATE = 9600
 # Message configuration settings
 HANDSHAKE = b'H'
 ZERO = bytes([0])
-ONE = bytes([1])
+TWO = bytes([2])
 MAX_MESSAGE_LENGTH = 256
 MESSAGE = [bytes([0])] * MAX_MESSAGE_LENGTH
 SLEEP_STANDARD = 4 # seconds to wait between interaction with devices
@@ -54,14 +54,14 @@ def FindSerialPorts():
 def GetNextMessage(thisPort):
   while thisPort.in_waiting <= 0: time.sleep(SLEEP_STANDARD) # wait for data
   MESSAGE[0] = thisPort.read() # read number of bytes in message
-  for i in range(1, int.from_bytes(MESSAGE[0], sys.byteorder) + 1):
+  for i in range(1, int.from_bytes(MESSAGE[0], sys.byteorder)):
     MESSAGE[i] = thisPort.read() # https://www.w3schools.com/python/python_for_loops.asp
 
 # Send a message
 def SendMessage(thisPort):
   # https://stackoverflow.com/questions/34009653/convert-bytes-to-int
   # https://www.w3schools.com/python/python_for_loops.asp
-  for i in range(0, int.from_bytes(MESSAGE[0], sys.byteorder) + 1): thisPort.write(MESSAGE[i])
+  for i in range(0, int.from_bytes(MESSAGE[0], sys.byteorder)): thisPort.write(MESSAGE[i])
 
 # Exchange handshakes between the two devices
 def DoHandshakes():
@@ -74,8 +74,7 @@ def DoHandshakes():
   MESSAGE[1] = ZERO
   while MESSAGE[1] != HANDSHAKE:
     MESSAGE[0] = ZERO
-    while MESSAGE[0] != ONE:
-      MESSAGE[0] = PORT_A.read()
+    while MESSAGE[0] != TWO: MESSAGE[0] = PORT_A.read()
     MESSAGE[1] = PORT_A.read()
   print("Success. Sending handshake to PORT_B.")
   SendMessage(PORT_B)
@@ -86,7 +85,7 @@ def DoHandshakes():
   MESSAGE[1] = ZERO
   while MESSAGE[1] != HANDSHAKE:
     MESSAGE[0] = ZERO
-    while MESSAGE[0] != ONE: MESSAGE[0] = PORT_B.read()
+    while MESSAGE[0] != TWO: MESSAGE[0] = PORT_B.read()
     MESSAGE[1] = PORT_B.read()
   print("Success. Sending handshake to PORT_A.")
   SendMessage(PORT_A)
@@ -146,15 +145,21 @@ if __name__ == '__main__':
     # Check PORT_A
     if PORT_A.in_waiting > 0:
       GetNextMessage(PORT_A)
+      #=======
+      #This is where something can be done with the data flow
       print(str(time.time()) + " > PORT_A message length: " +
             str(int.from_bytes(MESSAGE[0], sys.byteorder) + 1) + ". Value of Interest: " +
             str(int.from_bytes(MESSAGE[1], sys.byteorder)))
+      #=======
       SendMessage(PORT_B)
 
     # Check PORT_B
     if PORT_B.in_waiting > 0:
       GetNextMessage(PORT_B)
+      #=======
+      #This is where something can be done with the data flow
       print(str(time.time()) + " > PORT_B message length: " +
             str(int.from_bytes(MESSAGE[0], sys.byteorder) + 1) + ". Value of Interest: " +
             str(int.from_bytes(MESSAGE[1], sys.byteorder)))
+      #=======
       SendMessage(PORT_A)
