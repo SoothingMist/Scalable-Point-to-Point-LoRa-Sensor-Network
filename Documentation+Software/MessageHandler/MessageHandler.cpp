@@ -4,8 +4,17 @@
 
 #include "MessageHandler.h" // class declaration
 
+// Could not find a better way to host this callback routine.
+// Flags signal detection during CAD process
+uint8_t signalDetectionFlag = 00;
+// Callback for CAD process.
+void onCadDone(boolean signalDetected)
+{
+  signalDetectionFlag = (uint8_t)signalDetected;
+}
+
 // Constructor
-MessageHandler::MessageHandler(uint8_t nodeAddress = 00)
+MessageHandler::MessageHandler(uint8_t nodeAddress)
 {
   // Establish a unique address for this node within the network.
   LOCAL_ADDRESS = nodeAddress;
@@ -14,7 +23,7 @@ MessageHandler::MessageHandler(uint8_t nodeAddress = 00)
   // https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md
   // National Frequencies:
   // https://www.thethingsnetwork.org/docs/lorawan/frequencies-by-country
-  if (!LoRa.begin(915E6))
+  if (!LoRa.begin(FREQUENCY))
   {
     #ifdef DEBUG
       Serial.println("Starting LoRa failed!");
@@ -28,25 +37,23 @@ MessageHandler::MessageHandler(uint8_t nodeAddress = 00)
 
   // From calculator using payload size of 222 and overhead of 13.
   // https://avbentem.github.io/airtime-calculator/ttn/us915/222
-  MAX_MESSAGE_LENGTH = 0222;
-  LoRa.setSpreadingFactor(7);
-  LoRa.setSignalBandwidth(125E3);
+  LoRa.setSpreadingFactor(SPREADING_FACTOR);
+  LoRa.setSignalBandwidth(SIGNAL_BANDWIDTH);
   #ifdef DEBUG
-    Serial.print("Frequency: "); Serial.println(LoRa.getFrequency());
-    Serial.print("Spreading Factor: "); Serial.println(LoRa.getSpreadingFactor());
-    Serial.print("Signal Bandwidth: "); Serial.println(LoRa.getSignalBandwidth());
+    Serial.print("Frequency: "); Serial.println(FREQUENCY);
+    Serial.print("Spreading Factor: "); Serial.println(SPREADING_FACTOR);
+    Serial.print("Signal Bandwidth: "); Serial.println(SIGNAL_BANDWIDTH);
+    Serial.print("Max message length: "); Serial.println(MAX_MESSAGE_LENGTH);
     Serial.print("Node Address: "); Serial.println(LOCAL_ADDRESS);
   #endif
 
-  // Establis the vector that holds message data.
-  MESSAGE = new uint8_t[MAX_MESSAGE_LENGTH];
+  // Register the channel activity dectection callback
+  LoRa.onCadDone(onCadDone);
 }
 
 // Deconstructor
 MessageHandler::~MessageHandler()
 {
-  delete[] MESSAGE;
-  MESSAGE = NULL;
 }
 
 // Starts a message with its header
@@ -84,39 +91,37 @@ bool MessageHandler::SendTextMessage(String text, uint8_t destination)
   BroadcastPacket();
 }
 
-bool MessageHandler::CAD()
+// Wait for a specific number of milliseconds.
+// delay() is blocking so we do not use that.
+// This approach does not use hardware-specific timers.
+void MessageHandler::Wait(long milliseconds)
 {
-  // CAD not fully implemented by Sandeep library.
-  bool signalDetected = LoRa.rxSignalDetected();
-  
-  if (signalDetected)
-  {
-    Serial.println("Signal detected");
-  }
-  else
-  {
-    Serial.println("No signal detected. Could send something.");
-  }
-  return signalDetected;
+  long beginTime = millis();
+  uint8_t doSomething = 00;
+  while ((millis() - beginTime) <= milliseconds) doSomething++;
 }
 
 // Send a packet.
 void MessageHandler::BroadcastPacket()
 {
-  while(CAD()) Wait(100);                // wait for clear channel
-  LoRa.beginPacket();                    // start packet
-  LoRa.write(MESSAGE, MESSAGE[LOCATION_MESSAGE_LENGTH]); // add contents
-  LoRa.endPacket();                      // finish packet and send it
-  #ifdef DEBUG
-    Serial.print("Sent message of length "); Serial.println(MESSAGE[LOCATION_MESSAGE_LENGTH]);
-  #endif
-}
-
-void MessageHandler::Wait(long milliseconds)
-{
-  long beginTime = millis();
-  byte doSomething = 00;
-  while ((millis() - beginTime) <= milliseconds) doSomething++;
+  // try next activity detection.
+  // transmit if no signal detected.
+  signalDetectionFlag = 01; // assume there is a detection
+  while (signalDetectionFlag)
+  {
+    signalDetectionFlag = 02;
+    LoRa.channelActivityDetection();
+    while (signalDetectionFlag == 02) Wait(100);
+    if (!signalDetectionFlag) // no signal detected
+    {
+      LoRa.beginPacket(); // start packet
+      LoRa.write(MESSAGE, MESSAGE[LOCATION_MESSAGE_LENGTH]); // add contents
+      LoRa.endPacket(); // finish packet and send it
+      #ifdef DEBUG
+        Serial.print("Sent message of length "); Serial.println(MESSAGE[LOCATION_MESSAGE_LENGTH]);
+      #endif
+    }
+  }
 }
 
 // Look for an incoming packet. Parse if present.
@@ -154,11 +159,12 @@ int MessageHandler::CheckForIncomingPacket()
       return -1;
     }
 
+    // message is for this node
+
     for(int i = MESSAGE_HEADER_LENGTH; i < messageSize; i++)
       MESSAGE[i] = LoRa.read();
 
     #ifdef DEBUG
-      // if message is for this device, show details
       Serial.println("Received from: 0x" + String(MESSAGE[LOCATION_SOURCE_ID], HEX));
       Serial.println("Sent to: 0x" + String(MESSAGE[LOCATION_DESTINATION_ID], HEX));
       Serial.println("Message length: " + String(messageSize));

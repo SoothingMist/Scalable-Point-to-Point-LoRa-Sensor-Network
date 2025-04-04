@@ -1,14 +1,15 @@
 
 #pragma once
 
-// Required for various Arduino variable types
-#include <Arduino.h>
+// Check for appropriate board.
+#ifdef ARDUINO_SAMD_MKRWAN1300
+#error "This program is not compatible with the Arduino MKR WAN 1300 board!"
+#endif
 
-// Required for LoRa and Arduino.
-// A modification of Sandeep's library.
-// His exact library will not work here.
-// Use the version provided.
-#include "LoRa.h"
+// Required for LoRa functionality.
+// Install Sandeep's library from 
+// https://github.com/sandeepmistry/arduino-LoRa
+#include "LoRa.h" // includes Arduino.h
 
 // These constants are set for a given node within a given system.
 // There is some indication that they can be made permanently 
@@ -16,9 +17,28 @@
 // That can be done once we learn how.
 #define SYSTEM_ID 111
 
+// Transceiver configuration.
+// LoRa packets are composed of overhead and payload (envelope and contents).
+// Most commonly, the packet is 256 bytes in length.
+// https://www.sciencedirect.com/topics/computer-science/maximum-packet-size
+// Using this calculator, https://avbentem.github.io/airtime-calculator/ttn/us915/222,
+// we see that message length has to be limited to ensure compliance with maximum time for each transmission.
+// Spreading factor and signal bandwidth are set accordingly.
+// These factors are for a maximum message (payload) length of 222 bytes.
+#define FREQUENCY 915E6
+#define SPREADING_FACTOR 7
+#define SIGNAL_BANDWIDTH 125E3
+#define MAX_MESSAGE_LENGTH 222
+
 // Messages start with a standard header.
-// Byte cell index of header components are given here.
-// See MessageContents.html for a detailed explanation.
+// Message index of header components are given here.
+// Each cell of the message vector is 8 bits in size.
+// Note: Other terminology refers to "payload".
+//       That is the same as our "message".
+//       We form messages and send them via LoRa.
+//       The transceiver encloses the message in a packet
+//       and broadcasts the packet. Reception takes in
+//       a packet and extracts the message (payload).
 #define LOCATION_MESSAGE_LENGTH  0
 #define LOCATION_SYSTEM_ID       1
 #define LOCATION_SOURCE_ID       2
@@ -42,6 +62,7 @@ public:
 
   // Send specific messages to specific destinations.
   bool SendTextMessage(String text, uint8_t destination);
+  bool SendBinaryMessage(uint8_t message, uint8_t destination);
 
   // Check for incoming messages
   int CheckForIncomingPacket();
@@ -54,7 +75,6 @@ public:
 
 private:
 
-  uint8_t MAX_MESSAGE_LENGTH = 0; // maximum length of messages
   uint8_t LOCAL_ADDRESS = 0; // unique node address
   uint8_t messageIndex = 0; // cell index in current message vector
 
@@ -69,16 +89,10 @@ private:
   // Broadcasts a fully-formed LoRa packet
   void BroadcastPacket();
 
-  // Check for outside radio signal
-  bool CAD();
-
   // Non-blocking delay for some length of milliseconds
   void Wait(long milliseconds);
 
-  // LoRa packets are composed of overhead and payload (message envelope and contents).
-  // Most commonly, the packet is 256 bytes in length.
-  // https://www.sciencedirect.com/topics/computer-science/maximum-packet-size
-  // Using this calculator, https://avbentem.github.io/airtime-calculator/ttn/us915/222,
-  // we see that message length has to be limited to ensure compliance with maximum time for each transmission.
-  uint8_t* MESSAGE = NULL;
+  // Holds the message to be sent.
+  // Also holds received messages.
+  uint8_t MESSAGE[256]; // never longer
 };
