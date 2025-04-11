@@ -14,9 +14,9 @@
 // Includes Arduino.h
 // A modification of Sandeep's baseline library.
 // https://github.com/sandeepmistry/arduino-LoRa.
-// This variation is by Dias.
-// It deals with a duplicate-message problem in the baseline library.
-// https://github.com/mdias/arduino-LoRa
+// His baseline will not work in this program.
+// Use the version provided.
+// See documentation for details.
 #include <LoRa.h>
 
 // Establishes source and destination node addresses.
@@ -87,15 +87,16 @@ void loop()
 // Send a packet.
 void sendMessage(String outgoing)
 {
-  LoRa.beginPacket();                   // start packet
-  LoRa.write(destination);              // add destination address
-  LoRa.write(localAddress);             // add sender address
-  LoRa.write(msgCount);                 // add message ID
-  LoRa.write(outgoing.length());        // add payload length
-  LoRa.print(outgoing);                 // add payload
-  LoRa.endPacket();                     // finish packet and send it
+  while(LoRa.rxSignalDetected()) wait(100); // wait for clear channel
+  LoRa.beginPacket();                       // start packet
+  LoRa.write(destination);                  // add destination address
+  LoRa.write(localAddress);                 // add sender address
+  LoRa.write(msgCount);                     // add message ID
+  LoRa.write(outgoing.length());            // add payload length
+  LoRa.print(outgoing);                     // add payload
+  LoRa.endPacket();                         // finish packet and send it
   Serial.println("Sent: " + outgoing + "\n");
-  msgCount++;                           // increment message ID
+  msgCount++;                               // increment message ID
 }
 
 // Look for an incoming packet. Parse if present.
