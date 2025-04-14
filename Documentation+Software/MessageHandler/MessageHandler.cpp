@@ -1,17 +1,8 @@
 
 // Enables Serial.println diagnostics. Use when running with Serial Monitor.
-#define DEBUG
+//#define DEBUG
 
 #include "MessageHandler.h" // class declaration
-
-// Could not find a better way to host this callback routine.
-// Flags signal detection during CAD process
-uint8_t signalDetectionFlag = 00;
-// Callback for CAD process.
-void onCadDone(boolean signalDetected)
-{
-  signalDetectionFlag = (uint8_t)signalDetected;
-}
 
 // Constructor
 MessageHandler::MessageHandler(uint8_t nodeAddress)
@@ -47,8 +38,9 @@ MessageHandler::MessageHandler(uint8_t nodeAddress)
     Serial.print("Node Address: "); Serial.println(LOCAL_ADDRESS);
   #endif
 
-  // Register the channel activity dectection callback
-  LoRa.onCadDone(onCadDone);
+  // Not using these two callbacks in the baseline library
+  LoRa.onCadDone(NULL);
+  LoRa.onReceive(NULL);
 }
 
 // Deconstructor
@@ -104,24 +96,15 @@ void MessageHandler::Wait(long milliseconds)
 // Send a packet.
 void MessageHandler::BroadcastPacket()
 {
-  // try next activity detection.
-  // transmit if no signal detected.
-  signalDetectionFlag = 01; // assume there is a detection
-  while (signalDetectionFlag)
-  {
-    signalDetectionFlag = 02;
-    LoRa.channelActivityDetection();
-    while (signalDetectionFlag == 02) Wait(100);
-    if (!signalDetectionFlag) // no signal detected
-    {
-      LoRa.beginPacket(); // start packet
-      LoRa.write(MESSAGE, MESSAGE[LOCATION_MESSAGE_LENGTH]); // add contents
-      LoRa.endPacket(); // finish packet and send it
-      #ifdef DEBUG
+  // Try next channel activity detection.
+  // Transmit if no signal detected.
+  while (LoRa.rxSignalDetected()) Wait(100); // wait for clear channel
+  LoRa.beginPacket();                        // start packet
+  LoRa.write(MESSAGE, MESSAGE[LOCATION_MESSAGE_LENGTH]); // add contents
+  LoRa.endPacket();                          // finish packet and send it
+  #ifdef DEBUG
         Serial.print("Sent message of length "); Serial.println(MESSAGE[LOCATION_MESSAGE_LENGTH]);
-      #endif
-    }
-  }
+  #endif
 }
 
 // Look for an incoming packet. Parse if present.
