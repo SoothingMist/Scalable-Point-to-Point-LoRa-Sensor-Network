@@ -19,7 +19,7 @@ SERIAL_PORT_NAME = 'COM6' # Windows
 #Serial_PORT_NAME = '/dev/ttyACM1' # Linux
 SERIAL_PORT_BAUD_RATE = 9600
 
-MAX_MESSAGE_SIZE = 222 # LoRa message content has a maximum size
+MAX_MESSAGE_SIZE = 256 # LoRa packets are no longer than this
 EXPECTED_FINAL_MESSAGE = "<done>"
 
 # Location of elements in message vector
@@ -90,7 +90,9 @@ if __name__ == '__main__':
       if contents == EXPECTED_FINAL_MESSAGE: notDone = False
       else: print(str(time.time()) + ": " +  contents)
       # parse here and take appropriate action
-    else: print("Unknown message type")
+    else:
+      print("Unknown message type: ", end = "")
+      print(message[LOCATION_MESSAGE_TYPE])
 
   # Finished
   print("\nFinished.\n")
