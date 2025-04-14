@@ -6,12 +6,12 @@
 #define DEBUG
 
 // Unique address of this network node
-#define localAddress 01
+#define localAddress 1
 
 // Library for message handling.
-// Initializes LoRa library.
-#include "MessageHandler.h"
-MessageHandler *MessagingLibrary = NULL;
+// Includes LoRa library.
+#include <MessageHandler.h>
+MessageHandler *messagingLibrary = NULL;
 
 // Sends the voltage at the 5v pin.
 // Connect jumper wire between 5v and A1 pins.
@@ -32,14 +32,11 @@ void setup()
 {
   // Initialize serial port
   Serial.begin(9600);
-  while (!Serial) wait(5000); // wait for serial port to be ready
+  while (!Serial) delay(5000); // wait for serial port to be ready
   #ifdef DEBUG
     Serial.println("Node is active");
   #endif
   
-  // Initialize Messaging and LoRa libraries
-  MessagingLibrary = new MessageHandler(localAddress);
-
   // Initialize program-specific variables.
   randomSeed(localAddress);
   interval = random(maxInterval);
@@ -60,6 +57,9 @@ void setup()
   // We connect it to the 5v pin using a jumper.
   pinMode(inputPin, INPUT);
 
+  // Initialize message-handling library.
+  messagingLibrary = new MessageHandler(localAddress);
+  
   // Ready
   #ifdef DEBUG
     Serial.println("=================================================================");
@@ -78,32 +78,24 @@ void loop()
 
     // Compose message
     String message = "Volts: " + (String)volts;
-    
+    #ifdef DEBUG
+      Serial.print("Trying to send this message: "); Serial.println(message);
+    #endif
+
     // Send text message
     uint8_t destinationAddress = 03;
-    MessagingLibrary->SendTextMessage(message, destinationAddress);
+    messagingLibrary->SendTextMessage(message, destinationAddress);
     #ifdef DEBUG
-      Serial.print("Sent text message: "); Serial.print(message);
-      Serial.println(" (Text Length: " + (String)message.length() + ")");
-      const uint8_t* thisMessage = MessagingLibrary->getMESSAGE();
+      char* MESSAGE = (char*)messagingLibrary->getMESSAGE();
+      Serial.print("Sent this message: ");
       for(uint8_t i = MESSAGE_HEADER_LENGTH;
-          i < thisMessage[LOCATION_MESSAGE_LENGTH];
-          i++) Serial.print((char)thisMessage[i]);
-      Serial.println('\n');
+          i < MESSAGE[LOCATION_MESSAGE_LENGTH];
+          i++) Serial.print((char)MESSAGE[i]);
+      Serial.println(" (Text Length: " + (String)message.length() + ")\n");
     #endif
 
     // Select the next time to send
     lastSendTime = millis();
     interval = random(maxInterval);
   }
-}
-
-// Wait for a specific number of milliseconds.
-// delay() is blocking so we do not use that.
-// This approach does not use hardware-specific timers.
-void wait(long milliseconds)
-{
-  long beginTime = millis();
-  byte doSomething = 00;
-  while ((millis() - beginTime) <= milliseconds) doSomething++;
 }

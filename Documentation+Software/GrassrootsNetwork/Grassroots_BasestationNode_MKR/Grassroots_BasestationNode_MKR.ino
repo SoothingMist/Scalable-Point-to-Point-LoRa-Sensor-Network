@@ -17,14 +17,14 @@ uint16_t messageTrackingVariable = 00;
 
 // Library for message handling.
 // Initializes LoRa library.
-#include "MessageHandler.h"
+#include <MessageHandler.h>
 MessageHandler *MessagingLibrary = NULL;
 
 void setup()
 {
   // Initialize serial port
   Serial.begin(9600);
-  while (!Serial) Wait(5000); // wait for serial port to be ready
+  while (!Serial) delay(5000); // wait for serial port to be ready
   #ifdef DEBUG
     Serial.println("Node is active");
   #endif
@@ -54,8 +54,7 @@ void loop()
     thisMessageID = (thisMessageID << 8) | thisMessage[LOCATION_MESSAGE_ID + 1];
 
     // Reset message tracking table as appropriate
-    if(thisMessageID == 0) 
-      messageTrackingVariable = 0;
+    if(thisMessageID == 0) messageTrackingVariable = 0;
       
     // Ignore older messages or messages already seen.
 
@@ -100,14 +99,4 @@ void loop()
         Serial.write(thisMessage[i]);
     #endif
   }
-}
-
-// Wait for a specific number of milliseconds.
-// delay() is blocking so we do not use that.
-// This approach does not use hardware-specific timers.
-void Wait(long milliseconds)
-{
-  long beginTime = millis();
-  byte doSomething = 00;
-  while ((millis() - beginTime) <= milliseconds) doSomething++;
 }

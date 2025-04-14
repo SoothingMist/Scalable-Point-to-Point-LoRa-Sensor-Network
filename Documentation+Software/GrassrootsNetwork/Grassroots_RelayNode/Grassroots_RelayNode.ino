@@ -14,7 +14,7 @@
 // Establish message-tracking table.
 // Allows for ignoring older messages.
 // Process assumes low message rate.
-// This is normal per LoRa basis.
+// This is normal per underlying LoRa technology.
 // Network size depends on device memory size.
 // Node addresses are 1 .. MAX_NUM_NODES.
 // As written, system accommodates 256 unique
@@ -24,14 +24,14 @@ int MessageTrackingTable[MAX_NUM_NODES + 1];
 
 // Library for message handling.
 // Initializes LoRa library.
-#include "MessageHandler.h"
+#include <MessageHandler.h>
 MessageHandler *MessagingLibrary = NULL;
 
 void setup()
 {
   // Initialize serial port
   Serial.begin(9600);
-  while (!Serial) Wait(5000); // wait for serial port to be ready
+  while (!Serial) delay(5000); // wait for serial port to be ready
   #ifdef DEBUG
     Serial.println("Node is active");
   #endif
@@ -107,14 +107,4 @@ void loop()
       Serial.println();
     #endif
   }
-}
-
-// Wait for a specific number of milliseconds.
-// delay() is blocking so we do not use that.
-// This approach does not use hardware-specific timers.
-void Wait(long milliseconds)
-{
-  long beginTime = millis();
-  byte doSomething = 00;
-  while ((millis() - beginTime) <= milliseconds) doSomething++;
 }
