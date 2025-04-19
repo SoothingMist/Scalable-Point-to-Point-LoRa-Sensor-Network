@@ -73,6 +73,9 @@ public:
   // Relay a message with decrmented rebroadcast counter.
   void RelayMessage();
 
+  // Non-blocking delay for some length of milliseconds
+  void Wait(long milliseconds);
+
 private:
 
   uint8_t LOCAL_ADDRESS = 0; // unique node address
@@ -88,9 +91,6 @@ private:
 
   // Broadcasts a fully-formed LoRa packet
   void BroadcastPacket();
-
-  // Non-blocking delay for some length of milliseconds
-  void Wait(long milliseconds);
 
   // Holds the message to be sent.
   // Also holds received messages.
