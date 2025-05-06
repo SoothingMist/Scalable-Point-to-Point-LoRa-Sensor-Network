@@ -1,0 +1,3 @@
+# This is the requirements file for main.py
+pyserial
+
