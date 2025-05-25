@@ -20,7 +20,7 @@
 // As written, system accommodates 256 unique
 // node addresses, 0 .. 255.
 #define MAX_NUM_NODES 24
-int MessageTrackingTable[MAX_NUM_NODES + 1];
+uint16_t MessageTrackingTable[MAX_NUM_NODES + 1];
 
 // Library for message handling.
 // Initializes LoRa library.
