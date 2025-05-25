@@ -4,6 +4,5 @@
 #define Addresses
 
 byte localAddress = 0xFF;     // address of this device
-byte destination = 0xBB;      // destination to send to
-
+byte destination  = 0xBB;     // address of destination
 #endif
