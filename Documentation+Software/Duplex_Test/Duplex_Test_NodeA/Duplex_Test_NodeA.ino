@@ -2,7 +2,7 @@
   LoRa Duplex communication
 
   Sends a message at random intervals.
-  Polls continuallyfor new incoming messages.
+  Polls continually for new incoming messages.
   Implements a one-byte addressing scheme.
 
   Based on original LoRaDuplex example
@@ -64,7 +64,7 @@ void setup()
   
   // Ready
   Serial.println("===========================================");
-  Serial.println("Arduino MKR 1310 LoRa Send/Receive test");
+  Serial.println("Arduino MKR WAN 1310 LoRa Send/Receive test");
   Serial.println("===========================================");
 }
 
@@ -105,26 +105,27 @@ void onReceive(int packetSize)
   if (packetSize == 0) return;          // if there's no packet, return
 
   // read packet header bytes:
-  int recipient = LoRa.read();          // recipient address
+  byte recipient = LoRa.read();          // recipient address
   byte sender = LoRa.read();            // sender address
   byte incomingMsgId = LoRa.read();     // incoming msg ID
   byte incomingLength = LoRa.read();    // incoming msg length
 
   String incoming = "";
 
-  while (LoRa.available()) {
+  while (LoRa.available())
     incoming += (char)LoRa.read();
-  }
 
-  if (incomingLength != incoming.length()) {   // check length for error
+  if (incomingLength != incoming.length()) // check length for error
+  {
     Serial.println("error: message length does not match length");
-    return;                             // skip rest of function
+    return; // skip rest of function
   }
 
   // if the recipient isn't this device or broadcast,
-  if (recipient != localAddress) {
+  if (recipient != localAddress)
+  {
     Serial.println("This message is not for me.");
-    return;                             // skip rest of function
+    return; // skip rest of function
   }
 
   // if message is for this device, or broadcast, print details:
@@ -144,6 +145,6 @@ void onReceive(int packetSize)
 void wait(long milliseconds)
 {
   long beginTime = millis();
-  byte doSomething = 00;
+  byte doSomething = 0;
   while ((millis() - beginTime) <= milliseconds) doSomething++;
 }
