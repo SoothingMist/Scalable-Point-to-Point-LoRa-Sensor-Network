@@ -30,6 +30,7 @@ MessageHandler::MessageHandler(uint8_t nodeAddress)
   // https://avbentem.github.io/airtime-calculator/ttn/us915/222
   LoRa.setSpreadingFactor(SPREADING_FACTOR);
   LoRa.setSignalBandwidth(SIGNAL_BANDWIDTH);
+  LoRa.enableCrc(); // rejects corrupted messages without notice
   #ifdef DEBUG
     Serial.print("Frequency: "); Serial.println(FREQUENCY);
     Serial.print("Spreading Factor: "); Serial.println(SPREADING_FACTOR);
@@ -37,10 +38,6 @@ MessageHandler::MessageHandler(uint8_t nodeAddress)
     Serial.print("Max message length: "); Serial.println(MAX_MESSAGE_LENGTH);
     Serial.print("Node Address: "); Serial.println(LOCAL_ADDRESS);
   #endif
-
-  // Not using these two callbacks in the baseline library
-  LoRa.onCadDone(NULL);
-  LoRa.onReceive(NULL);
 }
 
 // Deconstructor
@@ -51,6 +48,9 @@ MessageHandler::~MessageHandler()
 // Starts a message with its header
 bool MessageHandler::StartMessage(uint8_t messageType, uint8_t destination)
 {
+  // Increment Source message ID.
+  sourceMessageID++;
+  
   MESSAGE[LOCATION_SYSTEM_ID] = SYSTEM_ID;
   MESSAGE[LOCATION_SOURCE_ID] = LOCAL_ADDRESS;
   MESSAGE[LOCATION_DESTINATION_ID] = destination;
@@ -62,6 +62,25 @@ bool MessageHandler::StartMessage(uint8_t messageType, uint8_t destination)
   return true;
 }
 
+// Send an image segment.
+bool MessageHandler::SendCameraData(uint8_t* imageSegment, uint8_t destination)
+{
+  // Ignore if segment is too long.
+  // Should trigger an error message if false is returned.
+  if ((MESSAGE_HEADER_LENGTH + imageSegment[0]) > MAX_MESSAGE_LENGTH)
+    return false;
+
+  // Start with the message header.
+  StartMessage(0, destination); // image-segment messages are type zero
+
+  // Add the segment to the message header.
+  MESSAGE[LOCATION_MESSAGE_LENGTH] = MESSAGE_HEADER_LENGTH + imageSegment[0];
+  memcpy(MESSAGE + MESSAGE_HEADER_LENGTH, imageSegment + 1, imageSegment[0] - 1);
+
+  // Create a packet containing the message and broadcast.
+  BroadcastPacket();
+}
+
 // Send text message.
 bool MessageHandler::SendTextMessage(String text, uint8_t destination)
 {
@@ -69,9 +88,6 @@ bool MessageHandler::SendTextMessage(String text, uint8_t destination)
   if((MESSAGE_HEADER_LENGTH + text.length()) > MAX_MESSAGE_LENGTH)
     return false;
 
-  // Increment Source message ID.
-  sourceMessageID++;
-  
   // Start with the message header.
   StartMessage(3, destination);
   

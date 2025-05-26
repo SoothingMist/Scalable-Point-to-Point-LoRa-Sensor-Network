@@ -62,7 +62,7 @@ public:
 
   // Send specific messages to specific destinations.
   bool SendTextMessage(String text, uint8_t destination);
-  bool SendBinaryMessage(uint8_t message, uint8_t destination);
+  bool SendCameraData(uint8_t* imageSegment, uint8_t destination);
 
   // Check for incoming messages
   int CheckForIncomingPacket();
