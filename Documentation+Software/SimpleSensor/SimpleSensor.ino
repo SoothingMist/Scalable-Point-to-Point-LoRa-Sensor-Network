@@ -1,5 +1,6 @@
 
-// This particular sensor node only sends the voltage at the 5v pin.
+// This particular sensor node sends the voltage read
+// at a given input pin.
 
 // Adds Arduino's language capabilities.
 // https://stackoverflow.com/questions/10612385/strings-in-c-class-file-for-arduino-not-compiling
@@ -38,9 +39,10 @@ void setup()
   pinMode(inputPin, INPUT);
 
   // Ready
-  Serial.println("=====================================");
-  Serial.println("Arduino MKR 1310 read-voltage test");
-  Serial.println("=====================================");
+  // Comment these if running with the serial plotter.
+  //Serial.println("=====================================");
+  //Serial.println("Arduino MKR 1310 read-voltage test");
+  //Serial.println("=====================================");
 }
 
 void loop()
@@ -48,7 +50,7 @@ void loop()
   // Read the input pin
   float adcValue = (float)analogRead(inputPin);
   float volts = (adcValue / analogResolution) * voltageReference;
-  Serial.println(volts);
+  Serial.println(volts, 1);
 
   // Wait a bit before repeating
   time_t beginTime = millis();
