@@ -1,16 +1,11 @@
 
-// Basic LoRa Sender Node.
+// Basic LoRa Receiver Node.
 // Designed for Arduino MKR WAN 1310 microcontroller with LoRa transceiver.
 // Original source for LoRa-sender code:
 // https://docs.arduino.cc/tutorials/mkr-wan-1310/lora-send-and-receive
 
 // Required for LoRa
-#include <SPI.h>
 #include <LoRa.h>
-
-// Adds Arduino's language capabilities.
-// https://stackoverflow.com/questions/10612385/strings-in-c-class-file-for-arduino-not-compiling
-#include <Arduino.h>
 
 void setup()
 {
@@ -30,6 +25,8 @@ void setup()
   if (!LoRa.begin(915E6))
   {
     Serial.println("Starting LoRa failed!");
+    time_t beginTime = millis(); // delay() is blocking so we do not use that
+    while ((millis() - beginTime) < 5000);
     exit(1);
   }
 
