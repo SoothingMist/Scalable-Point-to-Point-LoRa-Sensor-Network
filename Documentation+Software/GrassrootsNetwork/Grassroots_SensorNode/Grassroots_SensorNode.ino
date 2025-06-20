@@ -10,19 +10,20 @@
 
 // Library for message handling.
 // Includes LoRa library.
-#include <MessageHandler.h>
-MessageHandler *messagingLibrary = NULL;
+#include <LoRaMessageHandler.h>
+LoRaMessageHandler *LoRaMessagingLibrary = NULL;
 
-// Sends the voltage at the 5v pin.
-// Connect jumper wire between 5v and A1 pins.
+// Sends the voltage at the selected pin.
+// Connect jumper wire between GND and A1 pins.
 #define inputPin A1
 
-// Specifications for ADC.
-// See setup() for references.
 // The resolution is the number of ADC levels.
 // https://electronics.stackexchange.com/questions/406906/how-to-obtain-input-voltage-from-adc-value
 #define analogResolution 4096.0f
-#define voltageReference 5.0f
+
+// The voltage reference is 3.3v.
+// https://docs.arduino.cc/language-reference/en/functions/analog-io/analogReference
+#define voltageReference 3.3f
 
 long lastSendTime = 0;          // last send time
 const long maxInterval = 5000;  // maximum millisecond interval between sends
@@ -32,9 +33,13 @@ void setup()
 {
   // Initialize serial port
   Serial.begin(9600);
-  while (!Serial) delay(5000); // wait for serial port to be ready
+  while (!Serial) // wait for serial port to be ready
+  {
+    time_t beginTime = millis(); // delay() is blocking so we do not use that
+    while ((millis() - beginTime) < 5000);
+  }
   #ifdef DEBUG
-    Serial.println("Node is active");
+    Serial.println("Microprocessor is active");
   #endif
   
   // Initialize program-specific variables.
@@ -44,7 +49,7 @@ void setup()
   
   // Configure analog digital conversion (ADC).
   // MKR WAN 1310 is a SAMD board.
-  // Default reference is 5v.
+  // Default reference is given by AR_DEFAULT.
   // https://docs.arduino.cc/language-reference/en/functions/analog-io/analogReference
   // Capable of 12-bit ADC resolution.
   // This yields ADC output of 0 .. 4095.
@@ -53,12 +58,10 @@ void setup()
   analogReadResolution(12);
 
   // Configure analog input pin.
-  // Input pins will take up to 5vdc.
-  // We connect it to the 5v pin using a jumper.
   pinMode(inputPin, INPUT);
 
   // Initialize message-handling library.
-  messagingLibrary = new MessageHandler(localAddress);
+  LoRaMessagingLibrary = new LoRaMessageHandler(localAddress);
   
   // Ready
   #ifdef DEBUG
@@ -77,21 +80,22 @@ void loop()
     float volts = (adcValue / analogResolution) * voltageReference;
 
     // Compose message
-    String message = "Volts: " + (String)volts;
+    char message[100];
+    sprintf(message, "Volts: %5.1f\0", volts);
     #ifdef DEBUG
-      Serial.print("Trying to send this message: "); Serial.println(message);
+      Serial.print("Trying to send this message: "); Serial.println(String(message));
     #endif
 
     // Send text message
-    uint8_t destinationAddress = 03;
-    messagingLibrary->SendTextMessage(message, destinationAddress);
+    uint8_t destinationAddress = 3;
+    LoRaMessagingLibrary->SendTextMessage(message, destinationAddress);
     #ifdef DEBUG
-      char* MESSAGE = (char*)messagingLibrary->getMESSAGE();
+      char* MESSAGE = (char*)LoRaMessagingLibrary->getMESSAGE();
       Serial.print("Sent this message: ");
       for(uint8_t i = MESSAGE_HEADER_LENGTH;
           i < MESSAGE[LOCATION_MESSAGE_LENGTH];
           i++) Serial.print((char)MESSAGE[i]);
-      Serial.println(" (Text Length: " + (String)message.length() + ")\n");
+      Serial.println(" (Text Length: " + String(String(message).length()) + ")\n");
     #endif
 
     // Select the next time to send

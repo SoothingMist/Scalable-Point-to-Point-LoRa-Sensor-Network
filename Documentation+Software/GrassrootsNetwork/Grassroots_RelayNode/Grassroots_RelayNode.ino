@@ -9,12 +9,13 @@
 // Unique address of this network node.
 // Relays always have adderess of 0
 // since they are not sources nor destinations.
-#define localAddress 00
+#define localAddress 0
 
 // Establish message-tracking table.
 // Allows for ignoring older messages.
 // Process assumes low message rate.
 // This is normal per underlying LoRa technology.
+// Also due to national governing laws.
 // Network size depends on device memory size.
 // Node addresses are 1 .. MAX_NUM_NODES.
 // As written, system accommodates 256 unique
@@ -24,20 +25,24 @@ uint16_t MessageTrackingTable[MAX_NUM_NODES + 1];
 
 // Library for message handling.
 // Initializes LoRa library.
-#include <MessageHandler.h>
-MessageHandler *MessagingLibrary = NULL;
+#include <LoRaMessageHandler.h>
+LoRaMessageHandler *LoRaMessagingLibrary = NULL;
 
 void setup()
 {
   // Initialize serial port
   Serial.begin(9600);
-  while (!Serial) delay(5000); // wait for serial port to be ready
+  while (!Serial) // wait for serial port to be ready
+  {
+    time_t beginTime = millis(); // delay() is blocking so we do not use that
+    while ((millis() - beginTime) < 5000);
+  }
   #ifdef DEBUG
-    Serial.println("Node is active");
+    Serial.println("Microprocessor is active");
   #endif
   
   // Initialize Messaging and LoRa libraries
-  MessagingLibrary = new MessageHandler(localAddress);
+  LoRaMessagingLibrary = new LoRaMessageHandler(localAddress);
 
   // Initialize message tracking table
   for(int i = 0; i <= MAX_NUM_NODES; i++)
@@ -55,10 +60,10 @@ void loop()
 {
   // Check for incoming messages.
   // Rebroadcast messages as appropriate.
-  if(MessagingLibrary->CheckForIncomingPacket() > 0)
+  if(LoRaMessagingLibrary->CheckForIncomingPacket() > 0)
   {
     // Get a pointer to the received message
-    const uint8_t* thisMessage = MessagingLibrary->getMESSAGE();
+    const uint8_t* thisMessage = LoRaMessagingLibrary->getMESSAGE();
 
     // Ignore messages with a source address outside the
     // message tracking table.
@@ -71,7 +76,7 @@ void loop()
     }
 
     // Ignore messages whose rebroadcast counter has expired.
-    if(thisMessage[LOCATION_REBROADCASTS] == 00)
+    if(thisMessage[LOCATION_REBROADCASTS] == 0)
     {
       #ifdef DEBUG
         Serial.println("Rebroadcast counter is zero");
@@ -100,11 +105,12 @@ void loop()
     
     // Rebroadcast messages that pass muster.
     #ifdef DEBUG
-      Serial.println("Rebroadcasting");
+      Serial.print("Rebroadcasting... ");
     #endif
-    MessagingLibrary->RelayMessage();
+    LoRaMessagingLibrary->RelayMessage();
     #ifdef DEBUG
-      Serial.println();
+      Serial.println("Success\n");
     #endif
   }
+  //else Serial.println("No packet found");
 }

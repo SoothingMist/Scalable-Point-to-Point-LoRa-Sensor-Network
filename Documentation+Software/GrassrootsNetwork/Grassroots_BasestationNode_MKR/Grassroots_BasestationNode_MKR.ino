@@ -7,30 +7,34 @@
 //#define DEBUG
 
 // Unique address of this network node.
-#define localAddress 03
+#define localAddress 3
 
 // Establish message-tracking variable.
 // Allows for ignoring older messages.
 // Process assumes low message rate.
 // This is normal per LoRa basis.
-uint16_t messageTrackingVariable = 00;
+uint16_t messageTrackingVariable = 0;
 
 // Library for message handling.
 // Initializes LoRa library.
-#include <MessageHandler.h>
-MessageHandler *MessagingLibrary = NULL;
+#include <LoRaMessageHandler.h>
+LoRaMessageHandler *LoRaMessagingLibrary = NULL;
 
 void setup()
 {
   // Initialize serial port
   Serial.begin(9600);
-  while (!Serial) delay(5000); // wait for serial port to be ready
+  while (!Serial) // wait for serial port to be ready
+  {
+    time_t beginTime = millis(); // delay() is blocking so we do not use that
+    while ((millis() - beginTime) < 5000);
+  }
   #ifdef DEBUG
     Serial.println("Node is active");
   #endif
   
   // Initialize Messaging and LoRa libraries
-  MessagingLibrary = new MessageHandler(localAddress);
+  LoRaMessagingLibrary = new LoRaMessageHandler(localAddress);
 
   // Ready
   #ifdef DEBUG
@@ -44,10 +48,10 @@ void loop()
 {
   // Check for incoming messages.
   // Forward messages as appropriate.
-  if(MessagingLibrary->CheckForIncomingPacket() > 0)
+  if(LoRaMessagingLibrary->CheckForIncomingPacket() > 0)
   {
     // Get a pointer to the received message
-    const uint8_t* thisMessage = MessagingLibrary->getMESSAGE();
+    const uint8_t* thisMessage = LoRaMessagingLibrary->getMESSAGE();
 
     // Get incremental message ID
     uint16_t thisMessageID = thisMessage[LOCATION_MESSAGE_ID];
