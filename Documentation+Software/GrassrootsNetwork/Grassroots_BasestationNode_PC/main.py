@@ -15,11 +15,11 @@ import time # https://docs.python.org/3/library/time.html
 
 # Serial port to which the LoRa transceiver is connected
 Serial_Port = None
-SERIAL_PORT_NAME = 'COM6' # Windows
+SERIAL_PORT_NAME = 'COM16' # Windows
 #Serial_PORT_NAME = '/dev/ttyACM1' # Linux
 SERIAL_PORT_BAUD_RATE = 9600
 
-MAX_MESSAGE_SIZE = 256 # LoRa packets are no longer than this
+MAX_MESSAGE_SIZE = 222 # messages are no longer than this
 EXPECTED_FINAL_MESSAGE = "<done>"
 
 # Location of elements in message vector
