@@ -2,5 +2,4 @@
 Source: https://github.com/SergeyBel/AES
 
 Had to do something about message length becoming corrupted.
-Did a simple fix but more is needed.
 
