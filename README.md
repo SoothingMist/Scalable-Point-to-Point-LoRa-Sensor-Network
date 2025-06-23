@@ -31,11 +31,14 @@ Their paper discussed the design, implementation, and testing of their LoRa floo
 
 # License
 
-GNU Affero General Public License v3.0
+CC BY-NC 4.0 (Creative Commons Attribution-Noncommercial v4.0)
 
-Permissions of this strongest copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. When a modified version is used to provide a service over a network, the complete source code of the modified version must be made available.
+The CC BY-NC open-source license, specifically Creative Commons Attribution-NonCommercial (CC BY-NC), allows others to use, adapt, and build upon a work, but only for non-commercial purposes and with proper attribution to the original creator. This means you can share, remix, and adapt the work, but you cannot use it for profit.
 
-This is not legal advice. Learn more about this license:
- * https://www.gnu.org/licenses/agpl-3.0.en.html
- * https://github.com/SoothingMist/Scalable-Point-to-Point-LoRa-Sensor-Network/blob/main/LICENSE
+This is not legal advice. To read more about this license, see 
+
+https://pose.open.ubc.ca/open-education/creative-commons/what-are-the-different-types-of-creative-commons-licenses
+
+https://creativecommons.org/licenses/by-nc/4.0/deed.en
+
 
