@@ -59,8 +59,8 @@ void loop()
   // https://forum.arduino.cc/t/fixing-the-y-axis-on-the-serial-plotter-can-it-be-done-yes-it-can-sort-of/431095/2
   // https://www.youtube.com/watch?v=4AQg4vZ_vZI
   // https://github.com/vastevenson/multi-line-plots-arduino-demo
-  Serial.print("Sensor_Volts_" + String(volts));
-  Serial.println(",VWC_" + String(VWC));
+  Serial.print("Sensor_Volts=" + String(volts));
+  Serial.println(",VWC=" + String(VWC));
   if(volts != (float)NULL)
     Serial.print(volts, 1); Serial.print(","); Serial.println(VWC, 1);
 
