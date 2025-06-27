@@ -18,7 +18,7 @@ void setup()
 
   #ifndef DEBUG
     // Wait for connection with external device
-    Connect();
+    DataConnect();
   #else
     // Flush the serial port's incoming-data buffer.
     while (Serial.available() > 0) Serial.read();
@@ -43,7 +43,6 @@ void loop()
   // Notice that message can be no longer than 256 bytes and must contain at least one byte.
   #ifdef DEBUG
     String message = "Camera Ready. Awaiting one-character request.\n";
-    Serial.write((unsigned char)message.length());
     Serial.write(message.c_str(), message.length()); // Send "ready" message
   #endif
   while (Serial.available() == 0) Wait(100);    // await input
@@ -59,21 +58,21 @@ void loop()
 // Handshake with the connected device.
 // Reject any input but the handshake.
 // Both devices must use the same handshake.
-void Connect()
+void DataConnect()
 {
-  // Send handshake
-  MESSAGE[0] = 2;
-  MESSAGE[1] = HANDSHAKE;
-  ForwardMessage();
-
   // Receive handshake
-  MESSAGE[0] = 0;
-  MESSAGE[1] = 0;
-  while((MESSAGE[0] != 2) || (MESSAGE[1] != HANDSHAKE))
+  MESSAGE[0] = 00;
+  MESSAGE[1] = 00;
+  while((MESSAGE[0] != 02) || (MESSAGE[1] != HANDSHAKE))
   {
     Wait(100);
     ReceiveMessage();
   }
+  
+  // Send handshake
+  MESSAGE[0] = 02;
+  MESSAGE[1] = HANDSHAKE;
+  ForwardMessage();
 }
 
 void ReceiveMessage()

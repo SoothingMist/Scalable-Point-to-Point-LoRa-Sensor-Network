@@ -15,7 +15,7 @@ void setup()
   while(!Serial) Wait(100); // make sure Serial is ready
   
   // Wait for connection with external device
-  Connect();
+  TransceiverConnect();
 
   // Ask for entire image to be sent.
   // Comment this out if requests appear within the loop.
@@ -61,7 +61,7 @@ void loop()
 // Handshake with the connected device.
 // Reject any input but the handshake.
 // Both devices must use the same handshake.
-void Connect()
+void TransceiverConnect()
 {
   // Send handshake
   MESSAGE[0] = 2;
