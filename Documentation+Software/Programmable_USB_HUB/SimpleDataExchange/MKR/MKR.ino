@@ -15,7 +15,7 @@ void setup()
   while(!Serial) Wait(100); // make sure Serial is ready
 
   // Wait for connection with external device
-  Connect();
+  TransceiverConnect();
 
   // Initialize time before sending next message
   randomSeed(7); // different random seed for each
@@ -42,7 +42,7 @@ void loop()
 // Handshake with the connected device.
 // Reject any input but the handshake.
 // Both devices must use the same handshake.
-void Connect()
+void TransceiverConnect()
 {
   // Send handshake
   MESSAGE[0] = 2;

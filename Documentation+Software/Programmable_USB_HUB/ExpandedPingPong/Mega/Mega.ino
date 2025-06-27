@@ -2,7 +2,7 @@
 // Constants and variables used by various subroutines
 // Constants and variables regarding messages.
 const uint8_t HANDSHAKE = (uint8_t)'H';
-#define MAX_MESSAGE_LENGTH 255
+#define MAX_MESSAGE_LENGTH 222
 uint8_t MESSAGE[MAX_MESSAGE_LENGTH];
 uint8_t SIZE_OUTPUT_BUFFER = 0;
 
@@ -17,7 +17,7 @@ void setup()
   SIZE_OUTPUT_BUFFER = Serial.availableForWrite();
 
   // Wait for connection with external device
-  Connect();
+  DataConnect();
   Serial1.print("Respondent ready\n"); Serial1.flush();
 }
 
@@ -39,21 +39,21 @@ void loop()
 // Handshake with the connected device.
 // Reject any input but the handshake.
 // Both devices must use the same handshake.
-void Connect()
+void DataConnect()
 {
-  // Send handshake
-  MESSAGE[0] = 2;
-  MESSAGE[1] = HANDSHAKE;
-  ForwardMessage();
-
   // Receive handshake
-  MESSAGE[0] = 0;
-  MESSAGE[1] = 0;
-  while((MESSAGE[0] != 2) || (MESSAGE[1] != HANDSHAKE))
+  MESSAGE[0] = 00;
+  MESSAGE[1] = 00;
+  while((MESSAGE[0] != 02) || (MESSAGE[1] != HANDSHAKE))
   {
     Wait(100);
     ReceiveMessage();
   }
+  
+  // Send handshake
+  MESSAGE[0] = 02;
+  MESSAGE[1] = HANDSHAKE;
+  ForwardMessage();
 }
 
 void ReceiveMessage()

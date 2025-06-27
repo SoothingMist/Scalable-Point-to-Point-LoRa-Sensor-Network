@@ -2,7 +2,7 @@
 // Constants and variables used by various subroutines
 // Constants and variables regarding messages.
 const uint8_t HANDSHAKE = (uint8_t)'H';
-#define MAX_MESSAGE_LENGTH 255
+#define MAX_MESSAGE_LENGTH 222
 uint8_t MESSAGE[MAX_MESSAGE_LENGTH];
 uint8_t SIZE_OUTPUT_BUFFER = 0;
 
@@ -16,11 +16,11 @@ void setup()
   // https://www.arduino.cc/reference/tr/language/functions/communication/serial/availableforwrite
   SIZE_OUTPUT_BUFFER = Serial.availableForWrite();
 
- // Wait for connection with external device
-  Connect();
+  // Wait for connection with external device
+  TransceiverConnect();
 
   // Send instigator message
-  MESSAGE[0] = 223;
+  MESSAGE[0] = MAX_MESSAGE_LENGTH;
   MESSAGE[1] = 1;
   ForwardMessage();
 }
@@ -40,7 +40,7 @@ void loop()
 // Handshake with the connected device.
 // Reject any input but the handshake.
 // Both devices must use the same handshake.
-void Connect()
+void TransceiverConnect()
 {
   // Send handshake
   MESSAGE[0] = 2;

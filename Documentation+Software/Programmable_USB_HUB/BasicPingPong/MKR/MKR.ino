@@ -1,4 +1,7 @@
 
+// Transceiver side of programmable USB hub.
+// Instigates the communication.
+
 // Global onstants and variables used by various subroutines
 const uint8_t HANDSHAKE = (uint8_t)'H';
 #define MAX_MESSAGE_LENGTH 63
@@ -11,7 +14,7 @@ void setup()
   while(!Serial) Wait(100); // make sure Serial is ready
 
   // Wait for connection with external device
-  Connect();
+  TransceiverConnect();
 
   // Send instigator message
   MESSAGE[0] = 63;
@@ -34,7 +37,7 @@ void loop()
 // Handshake with the connected device.
 // Reject any input but the handshake.
 // Both devices must use the same handshake.
-void Connect()
+void TransceiverConnect()
 {
   // Send handshake
   MESSAGE[0] = 2;

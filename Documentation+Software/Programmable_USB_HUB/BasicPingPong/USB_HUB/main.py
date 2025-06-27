@@ -24,14 +24,16 @@ import sys
 # These are constants and should not be changed.
 
 # Constants associated with the two serial ports.
+# "None" values are set during configuration.
 PORT_A = None
-PORT_A_NAME = 'COM6' # Windows
+PORT_A_NAME = 'COM16' # Windows
 #PORT_A_NAME = '/dev/ttyACM1' # Linux
 PORT_A_BAUD_RATE = 9600
 PORT_B = None
 PORT_B_NAME = 'COM15' # Windows
-# PORT_B_NAME = '/dev/ttyACM0' # Linux
+#PORT_B_NAME = '/dev/ttyACM0' # Linux
 PORT_B_BAUD_RATE = 9600
+TRANSCEIVER_PORT = None
 
 # Message configuration settings
 HANDSHAKE = b'H'
@@ -71,30 +73,47 @@ def SendMessage(thisPort):
 
 # Exchange handshakes between the two devices
 def DoHandshakes():
+  global TRANSCEIVER_PORT
 
-  # Wait for connection HANDSHAKE from PORT_A.
-  # When received, send on to PORT_B.
-  # This process accommodates devices that spew
-  # out garbage upon startup.
-  print("\nLooking for PORT_A handshake: ", end = '')
-  MESSAGE[1] = ZERO
-  while MESSAGE[1] != HANDSHAKE:
-    MESSAGE[0] = ZERO
-    while MESSAGE[0] != TWO: MESSAGE[0] = PORT_A.read()
-    MESSAGE[1] = PORT_A.read()
-  print("Success. Sending handshake to PORT_B.")
-  SendMessage(PORT_B)
-
-  # Wait for connection HANDSHAKE from PORT_B.
-  # When received, send on to PORT_A.
-  print("Looking for PORT_B handshake: ", end = '')
-  MESSAGE[1] = ZERO
-  while MESSAGE[1] != HANDSHAKE:
-    MESSAGE[0] = ZERO
-    while MESSAGE[0] != TWO: MESSAGE[0] = PORT_B.read()
-    MESSAGE[1] = PORT_B.read()
-  print("Success. Sending handshake to PORT_A.")
-  SendMessage(PORT_A)
+  # Wait for connection HANDSHAKE from the transceiver.
+  # When received, send on to the data device.
+  # This process accommodates devices that spew garbage upon startup.
+  print("\nLooking for connection handshakes:")
+  connected = False
+  while not connected:
+    if PORT_A.in_waiting:
+      MESSAGE[0] = ZERO
+      while MESSAGE[0] != TWO: MESSAGE[0] = PORT_A.read()
+      MESSAGE[1] = PORT_A.read()
+      if MESSAGE[1] == HANDSHAKE:
+        SendMessage(PORT_B)
+        print("PORT_A sent handshake to Port_B.")
+        MESSAGE[0] = ZERO
+        MESSAGE[1] = ZERO
+        while MESSAGE[0] != TWO:
+          MESSAGE[0] = PORT_B.read()
+        while MESSAGE[1] != HANDSHAKE:
+          MESSAGE[1] = PORT_B.read()
+        SendMessage(PORT_A)
+        print("PORT_A received handshake from Port_B.")
+        TRANSCEIVER_PORT = PORT_A
+        connected = True
+    else:
+      if PORT_B.in_waiting:
+        MESSAGE[0] = ZERO
+        while MESSAGE[0] != TWO: MESSAGE[0] = PORT_B.read()
+        MESSAGE[1] = PORT_B.read()
+        if MESSAGE[1] == HANDSHAKE:
+          SendMessage(PORT_A)
+          print("PORT_B sent handshake to Port_A.")
+          MESSAGE[0] = ZERO
+          MESSAGE[1] = ZERO
+          while MESSAGE[0] != TWO: MESSAGE[0] = PORT_A.read()
+          while MESSAGE[1] != HANDSHAKE: MESSAGE[1] = PORT_A.read()
+          SendMessage(PORT_B)
+          print("PORT_B received handshake from Port_A.")
+          TRANSCEIVER_PORT = PORT_B
+          connected = True
 
 # Main Process
 if __name__ == '__main__':

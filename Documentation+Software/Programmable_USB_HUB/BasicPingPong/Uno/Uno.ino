@@ -1,4 +1,7 @@
 
+// Sensor/DataGenerator side of programmable USB hub.
+// Sends data upon request.
+
 // Global constants and variables used by various subroutines
 const uint8_t HANDSHAKE = (uint8_t)'H';
 #define MAX_MESSAGE_LENGTH 256
@@ -11,12 +14,12 @@ void setup()
   while(!Serial) Wait(100); // make sure Serial is ready
 
   // Wait for connection with external device
-  Connect();
+  DataConnect();
 }
 
 void loop()
 {
-  // Wait for a message
+  // Wait for a message request
   ReceiveMessage();
 
   // Increment the second byte and forward
@@ -29,13 +32,8 @@ void loop()
 // Handshake with the connected device.
 // Reject any input but the handshake.
 // Both devices must use the same handshake.
-void Connect()
+void DataConnect()
 {
-  // Send handshake
-  MESSAGE[0] = 02;
-  MESSAGE[1] = HANDSHAKE;
-  ForwardMessage();
-
   // Receive handshake
   MESSAGE[0] = 00;
   MESSAGE[1] = 00;
@@ -44,6 +42,11 @@ void Connect()
     Wait(100);
     ReceiveMessage();
   }
+  
+  // Send handshake
+  MESSAGE[0] = 02;
+  MESSAGE[1] = HANDSHAKE;
+  ForwardMessage();
 }
 
 void ReceiveMessage()
