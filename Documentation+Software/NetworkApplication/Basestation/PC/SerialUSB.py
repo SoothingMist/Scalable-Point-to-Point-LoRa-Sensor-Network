@@ -11,7 +11,7 @@ import queue # https://www.guru99.com/python-queue-example.html, https://docs.py
 # https://pypi.org/project/pyserial
 import serial, serial.tools.list_ports
 
-# Refers to serial port
+# Refers to serial port through which microcontroller talks to PC
 Serial_Port = None
 SERIAL_PORT_NAME = 'COM3' # Windows
 SERIAL_PORT_BAUD_RATE = 9600
@@ -94,7 +94,6 @@ def USB_Serial_Connection(name):
       incomingMessage = messageLength + Serial_Port.read(int.from_bytes(messageLength, 'little') - 1)
       messageQueue_mutex.acquire()
       messageQueue.put(incomingMessage)
-      #print(incomingMessage)
       messageQueue_mutex.release()
 
   # Thread ends

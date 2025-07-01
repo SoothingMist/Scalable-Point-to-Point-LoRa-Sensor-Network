@@ -181,7 +181,7 @@ def Start_Button_functionality():
   USB_Serial_Connection_thread = threading.Thread\
     (target = SerialUSB.USB_Serial_Connection, args = ("USB_Serial_Connection",))
 
-  # Start the thread
+  # Start the thread that reads the serial port
   USB_Serial_Connection_thread.start()
 
   # Open the file to which sensor data is written
@@ -205,6 +205,7 @@ def Stop_Button_functionality():
   root.quit()
 
 # GUI animation function. Animates camera images and line graphs.
+# Called repeatedly until stop_button is pressed.
 def animate(iteration):
 
   global graphNomenclature_previous, x_values, y_values, yMin, yMax#, sampleNumber
@@ -217,11 +218,12 @@ def animate(iteration):
   message = SerialUSB.GetNextMessage()
   if message is not None:
       # Get the message ID
-      messageID =\
+      messageID = \
         (message[LOCATION_MESSAGE_ID] << 8) | message[LOCATION_MESSAGE_ID + 1]
 
       if messageID is not None:
-        print("Message ", messageID, " of type ", message[LOCATION_MESSAGE_TYPE], " (", len(message), ")", end = " ")
+        print("Message ", messageID, " of type ",
+              message[LOCATION_MESSAGE_TYPE], " (", message[LOCATION_MESSAGE_LENGTH] , ")", end = "")
 
         # Check for message type 3, text-only notification
         if message[LOCATION_MESSAGE_TYPE] == 3:
@@ -232,45 +234,45 @@ def animate(iteration):
           messageDecoded = messageDecoded.split(':') # https://www.freecodecamp.org/news/how-to-parse-a-string-in-python
 
           # What to do with data
-          if messageDecoded[0] == "DATA":
+          if messageDecoded[0].strip() == "DATA" and \
+             (len(messageDecoded) - 1) % 2 == 0:
+            for v in range(1, len(messageDecoded), 2):
+              # Find out what we need to know about the sensor producing the incoming data
+              sensorNomenclature = str(message[LOCATION_SOURCE_ID]) + "-" + \
+                                   messageDecoded[v].strip()
+              now = str(datetime.datetime.now())  # get the current date and time
+              now = now[now.rfind(' ') + 1 : len(now)]  # format for this application
+              now = now[0 : now.rfind('.')]
+              if sensorDataFile is not None:  # https://www.w3schools.com/python/python_file_write.asp
+                sensorDataFile.write(str(datetime.date.today()) + "," + now + "," +
+                                     sensorNomenclature + "," + messageDecoded[v + 1] + "\n")
 
-            # Find out what we need to know about the sensor producing the incoming data
-            sensorNomenclature = str(message[LOCATION_SOURCE_ID]) + "-" + \
-                                 str(message[LOCATION_SENSOR_ID]) + "-" + \
-                                 messageDecoded[1]
-            now = str(datetime.datetime.now())  # get the current date and time
-            now = now[now.rfind(' ') + 1 : len(now)]  # format for this application
-            now = now[0 : now.rfind('.')]
-            if sensorDataFile is not None and messageDecoded[0].find("DATA") >= 0:  # https://www.w3schools.com/python/python_file_write.asp
-              sensorDataFile.write(str(datetime.date.today()) + "," + now + "," +
-                                   sensorNomenclature + "," + messageDecoded[2] + "\n")
+              # See if we have that sensor already in our list.
+              # If not already in the list, add it.
+              # https://www.freecodecamp.org/news/python-find-in-list-how-to-find-the-index-of-an-item-or-element-in-a-list
+              # https://stackoverflow.com/questions/51590357/appending-values-to-ttk-comboboxvalues-without-reloading-combobox
+              if sensorNomenclature not in graphSensors:
+                graphSensors.append(sensorNomenclature)
+                graphDropdown['values'] = graphSensors
+                if len(graphSensors) == 1:
+                  graphDropdown.set(graphSensors[0])
+                  graphNomenclature_previous = graphDropdown.get()
 
-            # See if we have that sensor already in our list.
-            # If not already in the list, add it.
-            # https://www.freecodecamp.org/news/python-find-in-list-how-to-find-the-index-of-an-item-or-element-in-a-list
-            # https://stackoverflow.com/questions/51590357/appending-values-to-ttk-comboboxvalues-without-reloading-combobox
-            if sensorNomenclature not in graphSensors:
-              graphSensors.append(sensorNomenclature)
-              graphDropdown['values'] = graphSensors
-              if len(graphSensors) == 1:
-                graphDropdown.set(graphSensors[0])
+              # If a new sensor has been selected then reset the data vectors
+              if graphNomenclature_previous != graphDropdown.get():
+                y_values = []
+                for index in range(MAX_SAMPLES): y_values.append(0)
                 graphNomenclature_previous = graphDropdown.get()
 
-            # If a new sensor has been selected then reset the data vectors
-            if graphNomenclature_previous != graphDropdown.get():
-              y_values = []
-              for index in range(MAX_SAMPLES): y_values.append(0)
-              graphNomenclature_previous = graphDropdown.get()
+              # Plot this data only if the sensor's nomenclature matches what has been selected
+              if sensorNomenclature == graphDropdown.get():
 
-            # Plot this data only if the sensor's nomenclature matches what has been selected
-            if sensorNomenclature == graphDropdown.get():
-
-              # https://www.tutorialspoint.com/how-to-rotate-tick-labels-in-a-subplot-in-matplotlib
-              # https://www.geeksforgeeks.org/matplotlib-axes-axes-set_xticklabels-in-python
-              graphLatestReading.set(messageDecoded[2] + " : " + now)
-              currentY = float(messageDecoded[2])
-              y_values.append(currentY)
-              y_values = y_values[-MAX_SAMPLES:]
+                # https://www.tutorialspoint.com/how-to-rotate-tick-labels-in-a-subplot-in-matplotlib
+                # https://www.geeksforgeeks.org/matplotlib-axes-axes-set_xticklabels-in-python
+                graphLatestReading.set(messageDecoded[v + 1] + " : " + now)
+                currentY = float(messageDecoded[v + 1])
+                y_values.append(currentY)
+                y_values = y_values[-MAX_SAMPLES:]
 
         # Check for message type 0, insert pixel data into image
         elif message[LOCATION_MESSAGE_TYPE] == 0:
