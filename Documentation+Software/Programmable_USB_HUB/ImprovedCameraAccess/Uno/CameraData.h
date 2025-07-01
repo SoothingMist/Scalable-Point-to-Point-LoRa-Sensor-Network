@@ -184,7 +184,7 @@ bool GatherCameraData()
       }
 
       // Forward the message through the serial port.
-      MESSAGE[0] = messageIndex;
+      MESSAGE[0] = messageIndex - 1;
       ForwardMessage();
     }
 
@@ -211,7 +211,7 @@ bool GatherCameraData()
       }
       
       // Forward the message through the serial port.
-      MESSAGE[0] = messageIndex;
+      MESSAGE[0] = messageIndex - 1;
       ForwardMessage();
     }
   }
