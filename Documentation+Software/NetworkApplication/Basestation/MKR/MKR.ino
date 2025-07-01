@@ -26,8 +26,8 @@ uint16_t MessageTrackingTable[MAX_NUM_NODES + 1];
 
 // Library for LoRa message handling.
 // Initializes LoRa library.
-#include <MessageHandler.h>
-MessageHandler *MessagingLibrary = NULL;
+#include <LoRaMessageHandler.h>
+LoRaMessageHandler *MessagingLibrary = NULL;
 
 void setup()
 {
@@ -35,11 +35,11 @@ void setup()
   Serial.begin(9600);
   while (!Serial) delay(500); // wait for serial port to be ready
   #ifdef DEBUG
-    Serial.println("Device is active");
+    Serial.println("Microcontroller is active");
   #endif
   
   // Initialize Messaging and LoRa libraries
-  MessagingLibrary = new MessageHandler(localAddress);
+  MessagingLibrary = new LoRaMessageHandler(localAddress);
 
   // Initialize message tracking table
   for(uint8_t i = 0; i <= MAX_NUM_NODES; i++)
@@ -47,9 +47,9 @@ void setup()
 
   // Ready
   #ifdef DEBUG
-    Serial.println("======================================================================");
+    Serial.println("==========================================================");
     Serial.println("Arduino MKR WAN 1310 LoRa flood-messaging basestation node");
-    Serial.println("======================================================================\n");
+    Serial.println("==========================================================\n");
   #endif
 }
 
