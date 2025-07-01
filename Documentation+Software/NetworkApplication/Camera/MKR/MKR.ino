@@ -2,10 +2,14 @@
 // Transceiver side of Programmable USB Hub.
 // Accepts messages from the hub and transmits them.
 
+// Enables use of Serial1 for debugging.
+// https://github.com/SoothingMist/Arduino-as-USB-to-Serial-Adaptor
+//#define DEBUG
+
 // Library for message handling.
 // Includes LoRa library.
-#include <MessageHandler.h>
-MessageHandler *messagingLibrary = NULL;
+#include <LoRaMessageHandler.h>
+LoRaMessageHandler *MessagingLibrary = NULL;
 
 // Unique address of this network node
 #define localAddress 2
@@ -22,11 +26,16 @@ void setup()
   Serial.begin(9600);
   while(!Serial) Wait(100); // make sure Serial is ready
 
+  #ifdef DEBUG
+    // Open Serial1
+    Serial1.begin(9600); while(! Serial1) delay(100);
+  #endif
+  
   // Initialize message-handling library.
-  messagingLibrary = new MessageHandler(localAddress);
+  MessagingLibrary = new LoRaMessageHandler(localAddress);
 
   // Wait for connection with external device
-  Connect();
+  TransceiverConnect();
 
   // Make sure the serial input buffer is empty.
   while(Serial.available()) Serial.read();
@@ -59,7 +68,10 @@ void loop()
     {
       // Transmit the message to the designated destination.
       uint8_t destinationAddress = 3;
-      messagingLibrary->SendCameraData(MESSAGE, destinationAddress);
+      MessagingLibrary->SendCameraData(MESSAGE, destinationAddress);
+      #ifdef DEBUG
+        Serial1.println("Arduino Loop. Message Length " + String(MESSAGE[0]));
+      #endif
     }
     else getAnotherSegment = false; // no more camera data to send
   }
@@ -70,7 +82,7 @@ void loop()
 // Handshake with the connected device.
 // Reject any input but the handshake.
 // Both devices must use the same handshake.
-void Connect()
+void TransceiverConnect()
 {
   // Send handshake
   MESSAGE[0] = 2;

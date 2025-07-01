@@ -32,7 +32,7 @@ extern void Wait(long milliseconds);
 // This value is because of the small memory size of the Arduino Uno R3.
 //#define MAX_MESSAGE_LENGTH 63
 // This value is due to laws in the USA. Tested with Arduino Mega 2560.
-#define MAX_MESSAGE_LENGTH 220
+#define MAX_MESSAGE_LENGTH 222
 // This value comes from the MessageHandler library.
 // That library deals with LoRa transmit/receive.
 // We ultimately will do that with messages formed here.
@@ -100,7 +100,7 @@ bool GatherCameraData()
   // Pixy2.1 cannot take static images.
   // Therefore, physically, the camera has to be held in a staring, continuous-dwell, position.
   // Motion in the image or the camera's motion changes the image as this code tries to send the image.
-  // The camera is in video mode. It does not deliver a static snapshot.
+  // The camera is in video mode.
 
   // Paints the image row by row.
   // The number of columns is divided by SEGMENT_SIZE,
@@ -159,7 +159,7 @@ bool GatherCameraData()
       }
 
       // Forward the message through the serial port.
-      MESSAGE[0] = messageIndex;
+      MESSAGE[0] = messageIndex - 1;
       while(Serial.peek() == -1) Wait(100); // wait for request for next segment
       while(Serial.available()) Serial.read(); // do not corrupt the MESSAGE vector
       ForwardMessage();
@@ -188,7 +188,7 @@ bool GatherCameraData()
       }
       
       // Forward the message through the serial port.
-      MESSAGE[0] = messageIndex;
+      MESSAGE[0] = messageIndex - 1;
       while(Serial.peek() == -1) Wait(100); // wait for request for next segment
       while(Serial.available()) Serial.read(); // do not corrupt the MESSAGE vector
       ForwardMessage();
