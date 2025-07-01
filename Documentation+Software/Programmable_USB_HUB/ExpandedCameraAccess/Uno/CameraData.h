@@ -159,7 +159,7 @@ bool GatherCameraData()
       }
 
       // Forward the message through the serial port.
-      MESSAGE[0] = messageIndex;
+      MESSAGE[0] = messageIndex - 1;
       while(Serial.peek() == -1) Wait(100); // wait for request for next segment
       while(Serial.available()) Serial.read(); // do not corrupt the MESSAGE vector
       ForwardMessage();
@@ -188,7 +188,7 @@ bool GatherCameraData()
       }
       
       // Forward the message through the serial port.
-      MESSAGE[0] = messageIndex;
+      MESSAGE[0] = messageIndex - 1;
       while(Serial.peek() == -1) Wait(100); // wait for request for next segment
       while(Serial.available()) Serial.read(); // do not corrupt the MESSAGE vector
       ForwardMessage();
