@@ -48,6 +48,10 @@ LoRaMessageHandler::~LoRaMessageHandler()
 // Starts a message with its header
 bool LoRaMessageHandler::StartMessage(uint8_t messageType, uint8_t destination)
 {
+  #ifdef DEBUG
+    Serial.println("StartMessage. Type " + String(messageType) + " to Node " + String(destination));
+  #endif
+
   // Increment Source message ID.
   sourceMessageID++;
   
@@ -65,6 +69,10 @@ bool LoRaMessageHandler::StartMessage(uint8_t messageType, uint8_t destination)
 // Send an image segment.
 bool LoRaMessageHandler::SendCameraData(uint8_t* imageSegment, uint8_t destination)
 {
+  #ifdef DEBUG
+    Serial.println("SendCameraData. Segment Length " + String(imageSegment[0]) + ". To Node " + String(destination));
+  #endif
+
   // Ignore if segment is too long.
   // Should trigger an error message if false is returned.
   if ((MESSAGE_HEADER_LENGTH + imageSegment[0]) > MAX_MESSAGE_LENGTH)
@@ -77,6 +85,10 @@ bool LoRaMessageHandler::SendCameraData(uint8_t* imageSegment, uint8_t destinati
   MESSAGE[LOCATION_MESSAGE_LENGTH] = MESSAGE_HEADER_LENGTH + imageSegment[0];
   memcpy(MESSAGE + MESSAGE_HEADER_LENGTH, imageSegment + 1, imageSegment[0] - 1);
 
+  #ifdef DEBUG
+    Serial.println("SendCameraData. Message Length " + String(MESSAGE[0]) + ". To Node " + String(destination));
+  #endif
+
   // Create a packet containing the message and broadcast.
   return BroadcastPacket();
 }
@@ -84,6 +96,10 @@ bool LoRaMessageHandler::SendCameraData(uint8_t* imageSegment, uint8_t destinati
 // Send text message.
 bool LoRaMessageHandler::SendTextMessage(String text, uint8_t destination)
 {
+  #ifdef DEBUG
+   Serial.println("SendTextMessage. '" + text + "' to Node " + String(destination));
+  #endif
+
   // Ignore if text is too long
   if((MESSAGE_HEADER_LENGTH + text.length()) > MAX_MESSAGE_LENGTH)
     return false;
@@ -99,29 +115,29 @@ bool LoRaMessageHandler::SendTextMessage(String text, uint8_t destination)
   return BroadcastPacket();
 }
 
-bool LoRaMessageHandler::SendRequest(uint8_t apparatus, uint16_t associatedValue, uint8_t destination)
+bool LoRaMessageHandler::SendRequest(uint8_t apparatus, uint32_t associatedValue, uint8_t destination)
 {
   // Start with the message header.
   StartMessage(1, destination);
 
   // Add apparatus ID and associated value
   MESSAGE[LOCATION_APPARATUS_ID] = apparatus;
-  memcpy(MESSAGE + MESSAGE_HEADER_LENGTH, &associatedValue, sizeof(uint16_t));
-  MESSAGE[LOCATION_MESSAGE_LENGTH] = MESSAGE_HEADER_LENGTH + sizeof(uint16_t);
+  memcpy(MESSAGE + MESSAGE_HEADER_LENGTH, &associatedValue, sizeof(uint32_t));
+  MESSAGE[LOCATION_MESSAGE_LENGTH] = MESSAGE_HEADER_LENGTH + sizeof(uint32_t);
 
   // Create a packet containing the message and broadcast.
   return BroadcastPacket();
 }
 
-bool LoRaMessageHandler::SendResponse(uint8_t apparatus, float value, uint8_t destination)
+bool LoRaMessageHandler::SendResponse(uint8_t apparatus, uint32_t associatedValue, uint8_t destination)
 {
   // Start with the message header.
   StartMessage(2, destination);
 
   // Add apparatus ID and associated value
   MESSAGE[LOCATION_APPARATUS_ID] = apparatus;
-  memcpy(MESSAGE + MESSAGE_HEADER_LENGTH, &value, sizeof(float));
-  MESSAGE[LOCATION_MESSAGE_LENGTH] = MESSAGE_HEADER_LENGTH + sizeof(float);
+  memcpy(MESSAGE + MESSAGE_HEADER_LENGTH, &associatedValue, sizeof(uint32_t));
+  MESSAGE[LOCATION_MESSAGE_LENGTH] = MESSAGE_HEADER_LENGTH + sizeof(uint32_t);
 
   // Create a packet containing the message and broadcast.
   return BroadcastPacket();
@@ -130,11 +146,16 @@ bool LoRaMessageHandler::SendResponse(uint8_t apparatus, float value, uint8_t de
 // Send a packet.
 bool LoRaMessageHandler::BroadcastPacket()
 {
+  #ifdef DEBUG
+    Serial.println("BroadcastPacket. Msg Length " + String(MESSAGE[LOCATION_MESSAGE_LENGTH]));
+  #endif
+
   // Try next channel activity detection.
   // Transmit if no signal detected.
   while (LoRa.rxSignalDetected()) Wait(100); // wait for clear channel
   LoRa.beginPacket();                        // start packet
   LoRa.write(MESSAGE, MESSAGE[LOCATION_MESSAGE_LENGTH]); // add contents
+  //Serial.println("Trying to end packet");
   LoRa.endPacket();                          // finish packet and send it
   #ifdef DEBUG
         Serial.print("Sent message of length "); Serial.println(MESSAGE[LOCATION_MESSAGE_LENGTH]);

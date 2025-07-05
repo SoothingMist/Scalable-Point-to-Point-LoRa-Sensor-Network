@@ -64,8 +64,8 @@ public:
   // Send specific messages to specific destinations.
   bool SendTextMessage(String text, uint8_t destination);
   bool SendCameraData(uint8_t* imageSegment, uint8_t destination);
-  bool SendRequest(uint8_t apparatus, uint16_t associatedValue, uint8_t destination);
-  bool SendResponse(uint8_t apparatus, float value, uint8_t destination);
+  bool SendRequest(uint8_t apparatus, uint32_t associatedValue, uint8_t destination);
+  bool SendResponse(uint8_t apparatus, uint32_t associatedValue, uint8_t destination);
   
   // Check for incoming messages
   int CheckForIncomingPacket();
