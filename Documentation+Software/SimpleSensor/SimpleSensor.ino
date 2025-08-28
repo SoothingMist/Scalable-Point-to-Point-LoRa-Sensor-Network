@@ -1,6 +1,8 @@
 
 // This particular sensor node reads the voltage
 // at a given input pin.
+// For the Arduino MKR WAN 1310, the input voltage
+// to that pin cannot exceed 3.3vdc.
 
 // Adds Arduino's language capabilities.
 // https://stackoverflow.com/questions/10612385/strings-in-c-class-file-for-arduino-not-compiling
