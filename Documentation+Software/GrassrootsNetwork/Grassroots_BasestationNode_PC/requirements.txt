@@ -13,6 +13,7 @@
 #    pip uninstall -r uninstall.txt -y
 # To uninstall an individual item, use   pip uninstall <item>
 
-serial
+pyserial
 esptool
 numpy
+
