@@ -227,5 +227,16 @@ void LoRaMessageHandler::Wait(long milliseconds)
   while ((millis() - beginTime) <= milliseconds) doSomething++;
 }
 
+// Return the contents of the present message.
 const uint8_t* LoRaMessageHandler::getMESSAGE() { return (const uint8_t*)MESSAGE; }
-void LoRaMessageHandler::RelayMessage() { MESSAGE[LOCATION_REBROADCASTS] -= 1; BroadcastPacket(); }
+
+// Relays rebroadcast messages.
+// That is the only purpose of a relay.
+void LoRaMessageHandler::RelayMessage()
+{
+  if (MESSAGE[LOCATION_REBROADCASTS] > 0)
+  {
+    MESSAGE[LOCATION_REBROADCASTS]--;
+    BroadcastPacket();
+  }
+}
